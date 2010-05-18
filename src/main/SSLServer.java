@@ -10,11 +10,8 @@ import java.net.Socket;
 import java.security.KeyStore;
 
 import javax.net.ServerSocketFactory;
-import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
 
 public class SSLServer extends Thread {
 
