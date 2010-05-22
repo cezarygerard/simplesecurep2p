@@ -13,26 +13,30 @@ import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
+/**
+ * @author czarek
+ *
+ */
 public class Server extends Thread {
 
 	public static void main(String[] args) throws Exception {
 
 		FileInputStream is = new FileInputStream("./key/serverKeys");
-		
+
 		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 		keystore.load(is, "123456".toCharArray());
-	
-//		TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX", "SunJSSE");
-	//	tmf.init(keystore);
-		
+
+		//		TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX", "SunJSSE");
+		//	tmf.init(keystore);
+
 		KeyManagerFactory kmf =   KeyManagerFactory.getInstance("SunX509", "SunJSSE");
 		kmf.init(keystore, ("123456").toCharArray());
-	//	KeyManager [] km = kmf.getKeyManagers();
+		//	KeyManager [] km = kmf.getKeyManagers();
 		SSLContext sc = SSLContext.getInstance("SSL");
 		
 		sc.init(kmf.getKeyManagers(), null, null);
-		
-		
+
+
 		ServerSocketFactory ssf = sc.getServerSocketFactory();
 		ServerSocket ss = ssf.createServerSocket(9097);
 
@@ -61,7 +65,7 @@ public class Server extends Thread {
 			sock.close();
 
 		} catch (IOException ioe) {
-			
+
 		}
 	}
 }
