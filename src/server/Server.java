@@ -1,4 +1,4 @@
-package main;
+package server;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -13,7 +13,7 @@ import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
-public class SSLServer extends Thread {
+public class Server extends Thread {
 
 	public static void main(String[] args) throws Exception {
 
@@ -39,14 +39,14 @@ public class SSLServer extends Thread {
 		int soks = 0;
 		System.out.println("Ready...");
 		while (true) {
-			new SSLServer(ss.accept()).start();
+			new Server(ss.accept()).start();
 			soks++;
 		}
 	}
 
 	private Socket sock;
 
-	public SSLServer(Socket s) {
+	public Server(Socket s) {
 		sock = s;
 	}
 
