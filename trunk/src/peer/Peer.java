@@ -1,4 +1,4 @@
-package main;
+package peer;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -12,7 +12,7 @@ import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-public class SSLClient {
+public class Peer {
 
 	public static void main(String[] args) throws Exception {
 
