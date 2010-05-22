@@ -35,7 +35,7 @@ public class Peer {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 		PrintWriter pw = new PrintWriter(s.getOutputStream());
-		for (int i = 0; i < 99; i++) {
+		for (int i = 0; i < 999; i++) {
 			pw.println("from java2s" + i );
 			Thread.sleep(Math.abs((new Random()).nextLong()%1000));
 			System.out.println("wysylanie");
