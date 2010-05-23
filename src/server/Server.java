@@ -12,7 +12,10 @@ import java.security.KeyStore;
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 
+import org.bouncycastle.x509.X509V1CertificateGenerator;
 /**
  * @author czarek
  *
@@ -35,16 +38,17 @@ public class Server extends Thread {
 		SSLContext sc = SSLContext.getInstance("SSL");
 		
 		sc.init(kmf.getKeyManagers(), null, null);
+	
 
-
-		ServerSocketFactory ssf = sc.getServerSocketFactory();
-		ServerSocket ss = ssf.createServerSocket(9097);
-
-		int soks = 0;
+		SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+		//sc.c
+		SSLServerSocket ss = (SSLServerSocket)ssf.createServerSocket(9097);
 		System.out.println("Ready...");
+		
+		
 		while (true) {
 			new Server(ss.accept()).start();
-			soks++;
+
 		}
 	}
 
