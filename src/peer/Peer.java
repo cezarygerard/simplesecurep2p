@@ -45,4 +45,4 @@ public class Peer {
 		System.out.println(br.readLine());
 		s.close();
 	}
-}
+}//twoja stara
