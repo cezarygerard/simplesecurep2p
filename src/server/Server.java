@@ -1,28 +1,22 @@
 package server;
 
-import java.beans.XMLEncoder;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyStore;
-import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
-import org.bouncycastle.x509.X509V1CertificateGenerator;
+import common.PeerInfo;
 /**
  * @author czarek
  *
@@ -31,37 +25,28 @@ public class Server extends Thread {
 
 	public static void main(String[] args) throws Exception {
 
-		
-		FileInputStream is = new FileInputStream("./key/serverKeys");
+
+		FileInputStream is = new FileInputStream("./res/common/key/serverKeys");
 
 		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 		keystore.load(is, "123456".toCharArray());
-
-
 		KeyManagerFactory kmf =   KeyManagerFactory.getInstance("SunX509", "SunJSSE");
 		kmf.init(keystore, ("123456").toCharArray());
-		//	KeyManager [] km = kmf.getKeyManagers();
 		SSLContext sc = SSLContext.getInstance("SSL");
-
 		sc.init(kmf.getKeyManagers(), null, null);
-
-
 		SSLServerSocketFactory ssf = sc.getServerSocketFactory();
-		//sc.c
 		SSLServerSocket ss = (SSLServerSocket)ssf.createServerSocket(9097);
-		
 		readLoginInfo();
-
 		System.out.println("Ready...");
-		
+
 		while (true) {
 			new Server(ss.accept()).start();
 
 		}
 	}
 
-	private TreeSet<PeerLoginInfo > loginInfo; 
-
+	private static TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); 
+	private static TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); 
 	private Socket sock;
 
 	private Server(Socket s) {
@@ -82,14 +67,30 @@ public class Server extends Thread {
 
 		}
 	}
-	
+
 	private static void readLoginInfo()
 	{
 		try {
-			FileInputStream fis = new FileInputStream("./server/serverKeys");
-			
+			System.out.println("readLoginInfo");
+			FileReader fr = new FileReader("./res/server/peerLoginInfo.dat");
+
+			BufferedReader br = new BufferedReader(fr);
+			StringTokenizer st;// = new StringTokenizer();
+			String line;
+			while((line = br.readLine()) != null)
+			{	
+				
+				st = new StringTokenizer(line);
+				if((st.countTokens() )!= 2)
+					throw new Exception("Ivalid peerLoginInfo.dat file");
+
+				loginInfo.add(new PeerLoginInfo(st.nextToken(), st.nextToken().getBytes()));
+
+				System.out.println("po");
+			}
+			System.out.println(loginInfo);
+
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

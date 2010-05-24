@@ -46,15 +46,17 @@ public class Peer {
 		s.startHandshake();
 		BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 		PrintWriter pw = new PrintWriter(s.getOutputStream());
+	
 		for (int i = 0; i < 999; i++) {
 			pw.println("from java2s" + i );
 			Thread.sleep(1000);
 			System.out.println("wysylanie");
 		}
+		
 		pw.println("from java2s.");
 		pw.flush();
 		System.out.println(br.readLine());
 		s.close();
 	}
 
-}//twoja stara
+}

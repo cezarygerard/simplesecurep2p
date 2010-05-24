@@ -24,18 +24,5 @@ public class FileInfo implements Serializable{
 	String desc;
 	long size;
 	transient File file;
-/*
-	public int compareTo(FileInfo o) {
-	
-		int ret;
-		if((ret = this.name.compareTo(o.name) )!=0)
-			return ret;
-		else
-			if(this.size < o.size)
-				return 1;
-			else
-				return 0;
-		
-	}
-*/	
+
 }
