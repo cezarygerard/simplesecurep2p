@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @author czarek
  *
  */
-public class FileInfo implements Serializable, Comparable<FileInfo>{
+public class FileInfo implements Serializable{
 	
 	public FileInfo(String name, String desc, long size) {
 		super();
@@ -24,7 +24,7 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 	String desc;
 	long size;
 	transient File file;
-
+/*
 	public int compareTo(FileInfo o) {
 	
 		int ret;
@@ -37,5 +37,5 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 				return 0;
 		
 	}
-	
+*/	
 }
