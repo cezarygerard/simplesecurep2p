@@ -1,13 +1,20 @@
 package server;
 
+import java.beans.XMLEncoder;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyStore;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
@@ -24,27 +31,28 @@ public class Server extends Thread {
 
 	public static void main(String[] args) throws Exception {
 
+		
 		FileInputStream is = new FileInputStream("./key/serverKeys");
 
 		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 		keystore.load(is, "123456".toCharArray());
 
-		//		TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX", "SunJSSE");
-		//	tmf.init(keystore);
 
 		KeyManagerFactory kmf =   KeyManagerFactory.getInstance("SunX509", "SunJSSE");
 		kmf.init(keystore, ("123456").toCharArray());
 		//	KeyManager [] km = kmf.getKeyManagers();
 		SSLContext sc = SSLContext.getInstance("SSL");
-		
+
 		sc.init(kmf.getKeyManagers(), null, null);
-	
+
 
 		SSLServerSocketFactory ssf = sc.getServerSocketFactory();
 		//sc.c
 		SSLServerSocket ss = (SSLServerSocket)ssf.createServerSocket(9097);
-		System.out.println("Ready...");
 		
+		readLoginInfo();
+
+		System.out.println("Ready...");
 		
 		while (true) {
 			new Server(ss.accept()).start();
@@ -52,9 +60,11 @@ public class Server extends Thread {
 		}
 	}
 
+	private TreeSet<PeerLoginInfo > loginInfo; 
+
 	private Socket sock;
 
-	public Server(Socket s) {
+	private Server(Socket s) {
 		sock = s;
 	}
 
@@ -72,4 +82,16 @@ public class Server extends Thread {
 
 		}
 	}
+	
+	private static void readLoginInfo()
+	{
+		try {
+			FileInputStream fis = new FileInputStream("./server/serverKeys");
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
+
