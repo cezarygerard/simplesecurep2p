@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.KeyStore;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -17,10 +18,12 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
 import common.PeerInfo;
+import common.PeerLoginInfo;
 /**
  * @author czarek
  *
  */
+
 public class Server extends Thread {
 
 	public static void main(String[] args) throws Exception {
@@ -47,6 +50,8 @@ public class Server extends Thread {
 
 	private static TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); 
 	private static TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); 
+//	private static TreeMap<String , PeerLoginInfo > loginInfo = new TreeMap<String , PeerLoginInfo>(); 
+//	private static TreeMap<String, PeerInfo > peersInfo = new TreeMap<String, PeerInfo >(); 
 	private Socket sock;
 
 	private Server(Socket s) {
@@ -67,7 +72,11 @@ public class Server extends Thread {
 
 		}
 	}
+	
 
+	/**
+	 * @TODO dodac sol do hasel
+	 */
 	private static void readLoginInfo()
 	{
 		try {

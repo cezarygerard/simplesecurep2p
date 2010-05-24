@@ -3,38 +3,38 @@ package common;
 public class PeerServerProtocol {
 	
 	//Peer
-	static final String LOGIN = "login";
+	public static final String LOGIN = "login";
 
 	//Server
-	static final String LOGGEDIN = "loggedin";
+	public static final String LOGGEDIN = "loggedin";
 
 	//Server
-	static final String LOGINFAILED = "loginfailed";
+	public static final String LOGINFAILED = "loginfailed";
 	
 	//Server
-	static final String GETYOURINFO = "getyourinfo";
+	public static final String GETYOURINFO = "getyourinfo";
 	
 	//Peer
-	static final String MYINFO = "myinfo";
+	public static final String MYINFO = "myinfo";
 	
 	//Peer
-	static final String GETCERT = "getcert";
+	public static final String GETCERT = "getcert";
 	
 	//Server
-	static final String CERT = "cert";
+	public static final String CERT = "cert";
 		
 	//Peer
-	static final String GETPEERSINFO = "getpeers";
+	public static final String GETPEERSINFO = "getpeers";
 		
 	//Server
-	static final String PEERSINFO = "peersinfo";
+	public static final String PEERSINFO = "peersinfo";
 	
 	//Peer or Server
-	static final String FAILURE = "failure";
+	public static final String FAILURE = "failure";
 	
 	//Peer or Server
-	static final String TIMEOUT = "timeout";
+	public static final String TIMEOUT = "timeout";
 	
 	//Peer or Server
-	static final String EXIT = "exit";
+	public static final String EXIT = "exit";
 }

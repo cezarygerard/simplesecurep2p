@@ -1,7 +1,9 @@
-package server;
+package common;
 
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
 
 /**
  * @author czarek
@@ -25,9 +27,18 @@ public class PeerLoginInfo implements Serializable, Comparable<PeerLoginInfo> {
 		this.passwdHash = passwdHash;
 	}
 	
+	public PeerLoginInfo(String login, String passwd) {
+		super();
+		this.login = login;
+		try {
+			this.passwdHash = utils.MDigest("SHA-512", passwd.getBytes());
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public int compareTo(PeerLoginInfo o) {
 		return this.login.compareTo(o.login);
 	}
-
-
 }
