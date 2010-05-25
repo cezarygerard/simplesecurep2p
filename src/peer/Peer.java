@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.util.Random;
+import java.util.TreeSet;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
@@ -34,12 +35,13 @@ import common.PeerLoginInfo;
  */
 public class Peer implements Runnable {
 
-	KeyStore keystore;
-	TrustManagerFactory tmf;
-	SSLContext sc;
-	SSLSocketFactory sf;
-	int listeningPort;
-	PeerLoginInfo peerLogin;
+	TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>();
+	private KeyStore keystore;
+	private TrustManagerFactory tmf;
+	private SSLContext sc;
+	private SSLSocketFactory sf;
+	private int listeningPort;
+	private PeerLoginInfo peerLogin;
 	PeerInfo myInfo;
 	
 	public Peer(String keystore,  char[] kestorePass, int listeningPort)

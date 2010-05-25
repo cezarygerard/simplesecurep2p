@@ -57,7 +57,7 @@ public class S2PConnection extends Connection implements Runnable{
 		while (!close)
 		{
 			try {
-				System.out.println("S2PConnection");
+				System.out.println("[S2PConnection.run] waiting for msg");
 				String command = input.readLine();
 				HandleCommand(command);
 				Thread.sleep(1000);
@@ -110,7 +110,9 @@ public class S2PConnection extends Connection implements Runnable{
 				PeerInfo pi = (PeerInfo) objInput.readObject();
 				System.out.println("[S2PConnection.HandleCommand] PeerInfo: " + pi);
 				server.peersInfo.add(pi);
+				
 			}
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			terminateConnection();

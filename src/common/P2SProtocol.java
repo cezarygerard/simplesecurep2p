@@ -29,7 +29,7 @@ public class P2SProtocol {
 	public static final String CERT = "cert";
 		
 	//Peer
-	public static final String GETPEERSINFO = "getpeers";
+	public static final String GETPEERSINFO = "getpeersinfo";
 		
 	//Server
 	public static final String PEERSINFO = "peersinfo";

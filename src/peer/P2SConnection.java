@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Timer;
+import java.util.TreeSet;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
@@ -18,6 +19,7 @@ import javax.net.ssl.SSLSocket;
 
 import common.Connection;
 import common.P2SProtocol;
+import common.PeerInfo;
 
 public class P2SConnection extends Connection implements Runnable {
 
@@ -89,11 +91,22 @@ public class P2SConnection extends Connection implements Runnable {
 		{
 			System.out.println("[P2SConnection.HandleCommand] command: " + command);
 
-			if (state == STATE.LOGGING && command.equals(P2SProtocol.LOGINACK))
+			if ((state == STATE.LOGGING && command.equals(P2SProtocol.LOGINACK)) || command.equals(P2SProtocol.GETYOURINFO))
 			{
+				System.out.println("[P2SConnection.HandleCommand.HandleCommand] MYINFO sending");
 				state=STATE.LOGGEDIN;
 				send(P2SProtocol.MYINFO);
 				send(peer.myInfo);
+				send(P2SProtocol.GETPEERSINFO);
+			}else
+			
+			if(command.equals(P2SProtocol.PEERSINFO))
+			{
+				System.out.println("[P2SConnection.HandleCommand] PEERSINFO");
+				TreeSet<PeerInfo> pi = (TreeSet<PeerInfo>) objInput.readObject();
+				peer.peersInfo = pi;
+				System.out.println("[S2PConnection.HandleCommand] PeersInfo: " + pi);
+				System.out.println("[S2PConnection.HandleCommand] PeersInfoStored: " + peer.peersInfo );
 			}
 		}
 		catch(Exception e){
