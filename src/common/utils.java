@@ -70,47 +70,61 @@ public class utils {
 		return hexString.toString();
 	}
 
-	
+
 	/**
 	 * Metoda wydrukuje informacje o dostepnych interface'ach sieciowych 
+	 * @throws SocketException 
 	 */
-	public static void printInterfaces()
+	public static void printInterfaces() 
 	{
 		Enumeration<NetworkInterface> e = null;
+
 		try {
 			e = NetworkInterface.getNetworkInterfaces();
 		} catch (SocketException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
+
+		NetworkInterface ni;
+
+		while(e.hasMoreElements())
+		{
+			ni = e.nextElement();
+
+			try {
+				if(ni.isUp() && !ni.isLoopback())
+				{	
+					System.out.println("NetworkInterface: " + ni);
+					System.out.println("ni.isUp() " + ni.isUp());
+					System.out.println("ni.getInetAddresses(): " + ni.getInetAddresses()); 
+					System.out.println("ni.getInterfaceAddresses() " + ni.getInterfaceAddresses());
+					System.out.println("ni.getName(): " + ni.getName());
+					System.out.println("ni.getParent(): " + ni.getParent());
+					System.out.println("ni.isVirtual(): "+ ni.isVirtual());
+					System.out.println("ni.isPointToPoint() "+ ni.isPointToPoint());
+					System.out.println(" ni.isLoopback() " + ni.isLoopback());
+				}
+			} catch (SocketException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+		}
+	}
+	/*	
+	public static NetworkInterface getValuableINterface() throws SocketException
+	{
+		Enumeration<NetworkInterface> e = null;
+
+		e = NetworkInterface.getNetworkInterfaces();
+
 		NetworkInterface ni;
 		while((ni = e.nextElement() )!= null)
 		{
-			System.out.println("NetworkInterface: " + ni);
-			try {
-				System.out.println("ni.isUp() " + ni.isUp());
-			} catch (SocketException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			System.out.println("ni.getInetAddresses(): " + ni.getInetAddresses()); 
-			System.out.println("ni.getInterfaceAddresses() " + ni.getInterfaceAddresses());
-			System.out.println("ni.getName(): " + ni.getName());
-			System.out.println("ni.getParent(): " + ni.getParent());
-			System.out.println("ni.isVirtual(): "+ ni.isVirtual());
-			try {
-				System.out.println("ni.isPointToPoint() "+ ni.isPointToPoint());
-			} catch (SocketException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try {
-				System.out.println(" ni.isLoopback() " + ni.isLoopback());
-			} catch (SocketException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 		}
-	}
 
+
+	}
+	 */
 }

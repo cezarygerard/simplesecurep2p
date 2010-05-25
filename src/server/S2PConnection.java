@@ -31,6 +31,14 @@ public class S2PConnection extends Connection implements Runnable{
 	S2PConnection(Socket accept, Server serv) {
 		super();
 		this.socket = (SSLSocket) accept;
+		System.out.println(socket.getRemoteSocketAddress());
+		System.out.println(socket.getLocalSocketAddress());
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		server =serv;
 		try {
 			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));

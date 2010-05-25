@@ -37,7 +37,6 @@ public class P2SConnection extends Connection implements Runnable {
 	void Connect() throws Exception 
 	{
 
-		//s = (SSLSocket) peer.sf.createSocket(hostname, port);
 		socket = (SSLSocket) peer.sf.createSocket(addr, port);
 		
 		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
@@ -47,7 +46,10 @@ public class P2SConnection extends Connection implements Runnable {
 			}			
 		});
 		//s.startHandshake();
-
+		
+		//to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania - wiemy jakie gniazdko dostaniemy od systemu
+		peer.myInfo = new PeerInfo(socket.getInetAddress(), 9998);
+		
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);	
 
@@ -102,6 +104,8 @@ public class P2SConnection extends Connection implements Runnable {
 				peer.peersInfo = pi;
 				System.out.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: " + pi);
 			}
+			
+			
 		}
 		catch(Exception e){
 			e.printStackTrace();
