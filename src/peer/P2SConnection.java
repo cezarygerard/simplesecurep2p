@@ -59,7 +59,7 @@ public class P2SConnection extends Connection implements Runnable {
 
 		send(P2SProtocol.LOGIN);
 
-		//	send(peer.peerLogin);
+		send(peer.peerLogin);
 
 		thread = new Thread(this);
 		thread.start();
