@@ -1,27 +1,12 @@
 package peer;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.Socket;
-import java.security.KeyManagementException;
+import java.net.UnknownHostException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
-import java.util.Random;
 import java.util.TreeSet;
 
-import javax.net.SocketFactory;
-import javax.net.ssl.HandshakeCompletedEvent;
-import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -64,10 +49,10 @@ public class Peer implements Runnable {
 		
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnknownHostException {
 
 		Peer p = new Peer("./res/common/key/serverKeys" , "123456".toCharArray(), 9795);
-		P2SConnection p2s = new P2SConnection(p, "localhost", 9995);
+		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.1.4"), 9995);
 		p.peerLogin = new PeerLoginInfo("czarek", "12345", false);
 		try {
 			p2s.Connect();

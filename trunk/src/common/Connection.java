@@ -17,30 +17,69 @@ import javax.net.ssl.SSLSocket;
 
 public abstract class Connection implements Runnable {
 
+	/**
+	 * przesylanie wiadomosci protokolu
+	 */
 	protected BufferedReader input;
+	/**
+	 * odczyt wiadomosci protokolu
+	 */
 	protected PrintWriter output;
+	/**
+	 * gniazdo sieciowe na ktorym odbywa sie komunikacja
+	 */
 	protected SSLSocket socket ;
+	/**
+	 * przesylanie obiektow przez siec
+	 */
 	protected ObjectOutput objOutput;
+	/**
+	 *  odczyt obiektow z siec
+	 */
 	protected ObjectInput objInput;
+	/**
+	 * timer do mierzenia timeoutow
+	 */
 	protected Timer timer;
+	/**
+	 * flaga zamykajaca polaczenie (konczy petle w metodzie run)
+	 * nie powinna byc zmieniana bezposrednio
+	 * w celu zakonczenia polaczeni nalezy wykonac terminateConnection()
+	 */
 	protected boolean close;
+	
+	/**
+	 * obiekt watku glownego
+	 */
 	protected Thread thread;
 	
+	/**
+	 * konstryktoe
+	 */
 	protected Connection() {
 		timer = new Timer();
 		close = false;
 	}
 
+	/**
+	 * metoda obslugujaca komendy protokolu
+	 */
 	protected void HandleCommand(String command) throws ClassNotFoundException, IOException {
 		// TODO Auto-generated method stub
 		
 	}
 
+	/**
+	 * wyslanie komendy
+	 */
 	protected void send(String command) {
         if (output != null)
             output.println(command);
     }
 
+	/**
+	 * wyslanie objektu
+	 */
 	protected void send(Object obj) {
 	    if (objOutput != null)
 			try {
@@ -51,6 +90,9 @@ public abstract class Connection implements Runnable {
 			}
 	}
 	
+	/**
+	 * zakonczenie polaczenia
+	 */
 	protected void terminateConnection()
 	{
 		send(P2SProtocol.FAILURE);

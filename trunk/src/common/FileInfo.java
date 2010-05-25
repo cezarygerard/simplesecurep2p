@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 /**
  * @author czarek
- *
+ * Klasa przechowujaca informacje o pliki
  */
 public class FileInfo implements Serializable{
 	
