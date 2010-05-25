@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -23,6 +24,7 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import common.PeerInfo;
 import common.PeerLoginInfo;
 
 
@@ -38,6 +40,7 @@ public class Peer implements Runnable {
 	SSLSocketFactory sf;
 	int listeningPort;
 	PeerLoginInfo peerLogin;
+	PeerInfo myInfo;
 	
 	public Peer(String keystore,  char[] kestorePass, int listeningPort)
 	{
@@ -46,11 +49,12 @@ public class Peer implements Runnable {
 			this.keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 			this.keystore.load(is,kestorePass);			
 			this.tmf = TrustManagerFactory.getInstance("PKIX", "SunJSSE");
-			tmf.init(this.keystore);
+			this.tmf.init(this.keystore);
 			this.sc = SSLContext.getInstance("TLS");
-			sc.init(null, tmf.getTrustManagers(), null);
+			this.sc.init(null, tmf.getTrustManagers(), null);
 			this.sf = sc.getSocketFactory();
 			this.listeningPort = listeningPort;
+			this.myInfo = new PeerInfo(InetAddress.getByName("192.168.1.4"), 9998);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -69,6 +73,7 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		while(true)
 		{
 			System.out.println("[Peer.main()] koniec");
