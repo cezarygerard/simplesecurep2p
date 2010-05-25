@@ -61,7 +61,7 @@ public class Peer implements Runnable {
 	public static void main(String[] args) {
 
 		Peer p = new Peer("./res/common/key/serverKeys" , "123456".toCharArray(), 9795);
-		P2SConnection p2s = new P2SConnection(p, "localhost", 9097);
+		P2SConnection p2s = new P2SConnection(p, "localhost", 9995);
 		p.peerLogin = new PeerLoginInfo("czarek", "12345");
 		try {
 			p2s.Connect();
@@ -69,19 +69,20 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("koniec");
+		while(true)
+		{
+			System.out.println("[Peer.main()] koniec");
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void run() {
-	//	while (true)
-     //       try {
-   //             String command = bufferReader.readLine();
-     //           if (!handleCommand(command)) {
-      //          }
-              	
-	//	catch (IOException e) {
-	//		e.printStackTrace();
-   //     }
+
 	}
 	
 
