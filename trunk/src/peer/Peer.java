@@ -41,7 +41,7 @@ public class Peer implements Runnable {
 			this.sc.init(null, tmf.getTrustManagers(), null);
 			this.sf = sc.getSocketFactory();
 			this.listeningPort = listeningPort;
-			this.myInfo = new PeerInfo(InetAddress.getByName("192.168.1.4"), 9998);
+		//	this.myInfo = new PeerInfo(InetAddress.getByName("192.168.1.4"), 9998);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -52,7 +52,7 @@ public class Peer implements Runnable {
 	public static void main(String[] args) throws UnknownHostException {
 
 		Peer p = new Peer("./res/common/key/serverKeys" , "123456".toCharArray(), 9795);
-		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.1.4"), 9995);
+		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.1.3"), 9995);
 		p.peerLogin = new PeerLoginInfo("czarek", "12345", false);
 		try {
 			p2s.Connect();

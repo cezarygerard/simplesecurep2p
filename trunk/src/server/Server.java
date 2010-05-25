@@ -18,6 +18,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import common.PeerInfo;
 import common.PeerLoginInfo;
+import common.utils;
 
 /**
  * @author czarek
@@ -64,15 +65,18 @@ public class Server {
 
 		Server server = new Server ("./res/common/key/serverKeys" , "123456".toCharArray(), 9995 );
 
+	/*	utils.printInterfaces();
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	*/
 		/**
-		 *
 		 * Zrob z tego w¹tek
 		 */
-		System.out.println(server.ss.getLocalSocketAddress() + "  "+ server.ss.getLocalPort());
-		
-	
-		
-		while (true) {
+			while (true) {
 			//new Server(ss.accept()).start();
 			try {
 				System.out.println("serwer czeka");
