@@ -1,3 +1,5 @@
+package klient;
+
 //package Klient_1;
 
 import java.io.BufferedReader;

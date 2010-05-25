@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import javax.net.ssl.HandshakeCompletedEvent;
@@ -43,7 +44,8 @@ public class P2SConnection implements Runnable {
 	void Connect() throws Exception 
 	{
 
-		s = (SSLSocket) peer.sf.createSocket(hostname, port);
+		//s = (SSLSocket) peer.sf.createSocket(hostname, port);
+		s = (SSLSocket) peer.sf.createSocket(InetAddress.getByName("192.168.1.4"), port);
 		s.addHandshakeCompletedListener(new HandshakeCompletedListener ()
 		{
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {

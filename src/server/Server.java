@@ -65,6 +65,8 @@ public class Server {
 		 *
 		 * Zrob z tego w¹tek
 		 */
+		System.out.println(server.ss.getLocalSocketAddress() + "  "+ server.ss.getLocalPort());
+		
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
