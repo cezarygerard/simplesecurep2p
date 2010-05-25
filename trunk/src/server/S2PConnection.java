@@ -12,6 +12,7 @@ import java.net.Socket;
 
 import javax.net.ssl.SSLSocket;
 
+import common.P2SProtocol;
 import common.PeerLoginInfo;
 
 /**
@@ -27,6 +28,7 @@ public class S2PConnection implements Runnable{
 	private ObjectOutput objOutput;
 	private ObjectInput objInput;
 	private STATE state;
+	private boolean close;
 	
 	private enum STATE {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
@@ -38,13 +40,14 @@ public class S2PConnection implements Runnable{
 		try {
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);
-	
+		close = false;
 
 		objOutput = new ObjectOutputStream(socket.getOutputStream());
 		objInput = new ObjectInputStream (socket.getInputStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		}
 		
 		Thread t = new  Thread(this);
@@ -53,8 +56,8 @@ public class S2PConnection implements Runnable{
 
 	@Override
 	public void run() {
-		boolean quit = false;
-		while (!quit)
+		
+		while (!close)
 		{
 			try {
 				System.out.println("S2PConnection");
@@ -65,7 +68,7 @@ public class S2PConnection implements Runnable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				try {
-					quit  = true;
+					close  = true;
 					socket.close();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -78,19 +81,33 @@ public class S2PConnection implements Runnable{
 
 	private void HandleCommand(String command) {
 		// TODO Auto-generated method stub
-		System.out.println("[P2SConnection.HandleCommand] command: " + command);
-	/*	
-		try {
-			PeerLoginInfo pli = (PeerLoginInfo)objInput.readObject();
-			System.out.println(pli);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		System.out.println("[S2PConnection.HandleCommand] command: " + command);
+		
+		if(command.equals(P2SProtocol.LOGIN))
+		{
+			PeerLoginInfo pli;
+			System.out.println("[S2PConnection.HandleCommand]");
+			try {
+				
+				pli = (PeerLoginInfo)objInput.readObject();
+				System.out.println(pli);
+				if(this.server.verifyPeer(pli))
+				{
+					System.out.println("[S2PConnection.HandleCommand] LOGINACK");
+					send(P2SProtocol.LOGINACK);
+				}
+				else
+				{
+					System.out.println("[S2PConnection.HandleCommand] LOGINFAILED");
+					send(P2SProtocol.LOGINFAILED);
+					close = true;
+				}
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
 		}
-		*/
 	}
 	
 	private void send(String command) {
@@ -107,5 +124,6 @@ public class S2PConnection implements Runnable{
 				e.printStackTrace();
 			}
 	}
+	
 
 }

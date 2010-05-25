@@ -1,12 +1,17 @@
 package common;
 
-public class PeerServerProtocol {
+/**
+ * @author czarek
+ * @TODO moze warto przerobic na protokol numerkowy tak, aby uzywac switch
+ * 
+ */
+public class P2SProtocol {
 	
 	//Peer
 	public static final String LOGIN = "login";
-
+	
 	//Server
-	public static final String LOGGEDIN = "loggedin";
+	public static final String LOGINACK = "logicack";
 
 	//Server
 	public static final String LOGINFAILED = "loginfailed";

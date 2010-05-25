@@ -16,7 +16,7 @@ import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLSocket;
 
 import common.Connection;
-import common.PeerServerProtocol;
+import common.P2SProtocol;
 
 public class P2SConnection implements Runnable {
 
@@ -60,7 +60,7 @@ public class P2SConnection implements Runnable {
 		objOutput = new ObjectOutputStream(s.getOutputStream());
 		objInput = new ObjectInputStream (s.getInputStream());
 
-		send(PeerServerProtocol.LOGIN);
+		send(P2SProtocol.LOGIN);
 
 	//	send(peer.peerLogin);
 
