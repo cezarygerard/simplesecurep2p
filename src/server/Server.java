@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.KeyStore;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
@@ -100,9 +101,21 @@ public class Server {
 				st = new StringTokenizer(line);
 				if((st.countTokens() )!= 2)
 					throw new Exception("Ivalid peerLoginInfo.dat file");
-
-				loginInfo.add(new PeerLoginInfo(st.nextToken(), st.nextToken().getBytes()));
-
+				String login = st.nextToken();
+				String hash =  st.nextToken();
+				byte [] realHash = new byte [hash.length()/2]; 
+				System.out.println("[Server.readLoginInfo()] " + hash.length());
+				
+				for(int i = 0 ; i < hash.length();)
+				{
+					realHash[i/2] = (byte)(( Character.digit(hash.charAt(i), 16) << 4 )+ Character.digit(hash.charAt(i +1), 16));
+				//	Byte b = new Byte(hash.substring(i, i+1)));
+					//realHash[i] = b.byteValue();
+					i +=2;
+					
+				}
+				loginInfo.add(new PeerLoginInfo(login, realHash));
+				System.out.println("[Server.readLoginInfo()] hash" + hash + " " + realHash);
 			}
 			System.out.println("[Server.readLoginInfo()] " + loginInfo);
 
@@ -114,7 +127,7 @@ public class Server {
 	boolean verifyPeer(PeerLoginInfo pli)
 	{
 		PeerLoginInfo pliAtServer= (loginInfo.subSet(pli, true, pli, true)).first();
-		if (pliAtServer != null && pliAtServer.getPasswdHash() == pli.getPasswdHash())
+		if (pliAtServer != null && Arrays.equals(pliAtServer.getPasswdHash(),  pli.getPasswdHash()))
 			return true;
 		else
 			return false;

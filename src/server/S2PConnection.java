@@ -87,8 +87,7 @@ public class S2PConnection implements Runnable{
 		{
 			PeerLoginInfo pli;
 			System.out.println("[S2PConnection.HandleCommand]");
-			try {
-				
+			try {				
 				pli = (PeerLoginInfo)objInput.readObject();
 				System.out.println(pli);
 				if(this.server.verifyPeer(pli))
