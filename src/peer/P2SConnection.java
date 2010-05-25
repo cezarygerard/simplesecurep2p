@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Timer;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
@@ -18,18 +19,13 @@ import javax.net.ssl.SSLSocket;
 import common.Connection;
 import common.P2SProtocol;
 
-public class P2SConnection implements Runnable {
+public class P2SConnection extends Connection implements Runnable {
 
 	private Peer peer;
 	private String hostname;
 	private int port;
-	private BufferedReader input;
-	private PrintWriter output;
-	private SSLSocket s ;
-	private ObjectOutput objOutput;
-	private ObjectInput objInput;
 	private STATE state;
-	
+
 	private enum STATE {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
 	}
@@ -45,8 +41,9 @@ public class P2SConnection implements Runnable {
 	{
 
 		//s = (SSLSocket) peer.sf.createSocket(hostname, port);
-		s = (SSLSocket) peer.sf.createSocket(InetAddress.getByName("192.168.1.4"), port);
-		s.addHandshakeCompletedListener(new HandshakeCompletedListener ()
+		socket = (SSLSocket) peer.sf.createSocket(InetAddress.getByName("192.168.1.4"), port);
+		
+		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
 		{
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {
 				System.out.println("handshakeCompleted " + arg0.toString() + arg0);						
@@ -54,26 +51,25 @@ public class P2SConnection implements Runnable {
 		});
 		//s.startHandshake();
 
-		input = new BufferedReader(new InputStreamReader(s.getInputStream()));
-		output = new PrintWriter(s.getOutputStream(), true);	
+		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		output = new PrintWriter(socket.getOutputStream(), true);	
 
-		objOutput = new ObjectOutputStream(s.getOutputStream());
-		objInput = new ObjectInputStream (s.getInputStream());
+		objOutput = new ObjectOutputStream(socket.getOutputStream());
+		objInput = new ObjectInputStream (socket.getInputStream());
 
 		send(P2SProtocol.LOGIN);
 
-	//	send(peer.peerLogin);
+		//	send(peer.peerLogin);
 
-		Thread newThrd = new Thread(this);
-		newThrd.start();
+		thread = new Thread(this);
+		thread.start();
 		state = STATE.LOGGING;
 		System.out.println("[P2SConnection.Connect()] ");
 
 	}
 
 	public void run() {
-		boolean quit = false;
-		while (!quit)
+		while (!close)
 		{
 			try {
 				System.out.println("P2SConnection");
@@ -83,36 +79,27 @@ public class P2SConnection implements Runnable {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				quit = true;
+				close = true;
 			}
 		}
 	}
 
-	private void HandleCommand(String command) {
-		System.out.println("[P2SConnection.HandleCommand] command: " + command);
-
-	}
-
-	private void send(String command) {
-		if (output != null)
+	protected void HandleCommand(String command) {
+		try
 		{
-			output.println(command);
-		}
-	}
+			System.out.println("[P2SConnection.HandleCommand] command: " + command);
 
-	private void send(Object obj) {
-		if (objOutput != null)
-			try {
-				objOutput.writeObject(obj);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (state == STATE.LOGGING && command.equals(P2SProtocol.LOGINACK))
+			{
+				state=STATE.LOGGEDIN;
+				send(P2SProtocol.MYINFO);
+				send(peer.myInfo);
 			}
-	}
-	
-	protected void finalize() 
-	{
-		System.out.println("[P2SConnection.finalize]");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			
+			terminateConnection();
+		}
 	}
 }
-

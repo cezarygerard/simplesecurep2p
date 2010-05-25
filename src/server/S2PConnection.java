@@ -12,51 +12,48 @@ import java.net.Socket;
 
 import javax.net.ssl.SSLSocket;
 
+import common.Connection;
 import common.P2SProtocol;
+import common.PeerInfo;
 import common.PeerLoginInfo;
 
 /**
  * @author czarek
  * TODO wylaczyc czesc wspolna klas S2PConnection i P2SConnection i zrobic wspolna nadklase
  */
-public class S2PConnection implements Runnable{
-	
+public class S2PConnection extends Connection implements Runnable{
+
 	Server server;
-	private BufferedReader input;
-	private PrintWriter output;
-	private SSLSocket socket ;
-	private ObjectOutput objOutput;
-	private ObjectInput objInput;
 	private STATE state;
-	private boolean close;
-	
+	private boolean loggedin;
 	private enum STATE {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
 	}
-	
+
 	S2PConnection(Socket accept, Server serv) {
+		super();
 		this.socket = (SSLSocket) accept;
 		server =serv;
 		try {
-		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		output = new PrintWriter(socket.getOutputStream(), true);
-		close = false;
-
-		objOutput = new ObjectOutputStream(socket.getOutputStream());
-		objInput = new ObjectInputStream (socket.getInputStream());
+			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			output = new PrintWriter(socket.getOutputStream(), true);
+			close = false;
+			loggedin = false;
+			objOutput = new ObjectOutputStream(socket.getOutputStream());
+			objInput = new ObjectInputStream (socket.getInputStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
+
 		}
-		
-		Thread t = new  Thread(this);
-		t.start();
+
+		thread = new  Thread(this);
+		thread.start();
 	}
 
 	@Override
 	public void run() {
-		
+
 		while (!close)
 		{
 			try {
@@ -73,56 +70,52 @@ public class S2PConnection implements Runnable{
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					terminateConnection();
 				}
 			}
 		}
-		
+
 	}
 
-	private void HandleCommand(String command) {
-		// TODO Auto-generated method stub
-		System.out.println("[S2PConnection.HandleCommand] command: " + command);
-		
-		if(command.equals(P2SProtocol.LOGIN))
-		{
-			PeerLoginInfo pli;
-			System.out.println("[S2PConnection.HandleCommand]");
-			try {				
-				pli = (PeerLoginInfo)objInput.readObject();
-				System.out.println(pli);
+	protected void HandleCommand(String command) {
+		try{
+			System.out.println("[S2PConnection.HandleCommand] command: " + command);
+
+			if(command.equals(P2SProtocol.LOGIN))
+			{
+				System.out.println("[S2PConnection.HandleCommand]");
+
+				PeerLoginInfo pli = (PeerLoginInfo)objInput.readObject();
+
 				if(this.server.verifyPeer(pli))
 				{
 					System.out.println("[S2PConnection.HandleCommand] LOGINACK");
 					send(P2SProtocol.LOGINACK);
+					loggedin = true;
 				}
 				else
 				{
 					System.out.println("[S2PConnection.HandleCommand] LOGINFAILED");
 					send(P2SProtocol.LOGINFAILED);
-					close = true;
+					terminateConnection();
 				}
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
+			} 
+			else if (loggedin != true)
+			{
+				System.out.println("[S2PConnection.HandleCommand] wrong msg");
+				terminateConnection();
+			}
+			else if (command.equals(P2SProtocol.MYINFO))
+			{
+				PeerInfo pi = (PeerInfo) objInput.readObject();
+				server.peersInfo.add(pi);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			terminateConnection();
 		}
-	}
-	
-	private void send(String command) {
-		if (output != null)
-			output.println(command);
+
 	}
 
-	private void send(Object obj) {
-		if (objOutput != null)
-			try {
-				objOutput.writeObject(obj);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	}
-	
 
 }

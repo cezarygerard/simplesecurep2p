@@ -26,7 +26,7 @@ import common.PeerLoginInfo;
 public class Server {
 
 	private TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); ; 
-	private TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); ;
+	TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); ;
 	private FileInputStream is ; 
 	private KeyStore keystore;
 	private KeyManagerFactory kmf;
@@ -130,9 +130,7 @@ public class Server {
 		if (pliAtServer != null && Arrays.equals(pliAtServer.getPasswdHash(),  pli.getPasswdHash()))
 			return true;
 		else
-			return false;
-				
-	}
-	
+			return false;			
+	}	
 }
 

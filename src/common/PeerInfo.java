@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.TreeMap;
 
 /**
@@ -30,6 +31,11 @@ public class PeerInfo implements Serializable {
 			e.printStackTrace();
 		} 
 //		this.files = files_;
+	}
+
+	public String toString() {
+		return "PeerInfo [addr=" + addr + ", addrMd=" + Arrays.toString(addrMd)
+				+ ", listeningPort=" + listeningPort + "]";
 	}
 	
 }
