@@ -49,13 +49,17 @@ public class P2SConnection implements Runnable {
 			}			
 		});
 		s.startHandshake();
+		
 		input = new BufferedReader(new InputStreamReader(s.getInputStream()));
 		output = new PrintWriter(s.getOutputStream());	
+		
 		objOutput = new ObjectOutputStream(s.getOutputStream());
 		objInput = new ObjectInputStream (s.getInputStream());
 		
 		send(PeerServerProtocol.LOGIN);
+		
 		objOutput.writeObject(peer.peerLogin);
+		
 		Thread newThrd = new Thread(this);
 		newThrd.start();
 		state = STATE.LOGGING;

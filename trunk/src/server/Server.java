@@ -4,12 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.security.KeyStore;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -19,39 +15,80 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import common.PeerInfo;
 import common.PeerLoginInfo;
+
 /**
  * @author czarek
- *
+ * TODO ta klasa powinna byc singletonem
+ * TODO zaimplementowa
  */
 
-public class Server extends Thread {
+public class Server {
 
-	public static void main(String[] args) throws Exception {
+	private static TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); ; 
+	private static TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); ;
+	FileInputStream is ; 
+	KeyStore keystore;
+	KeyManagerFactory kmf;
+	SSLContext sc;
+	SSLServerSocketFactory ssf;
+	SSLServerSocket ss;
 
+	public Server(String keystoreLoc,  char[] kestorePass, int listeningPort)
+	{
+		try {
+			is = new FileInputStream(keystoreLoc) ;
+			this.keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+			keystore.load(is, "123456".toCharArray());
+			kmf =   KeyManagerFactory.getInstance("SunX509", "SunJSSE");
+			kmf.init(keystore, ("123456").toCharArray());
+			sc = SSLContext.getInstance("SSL");
+			sc.init(kmf.getKeyManagers(), null, null);
+			ssf = sc.getServerSocketFactory();
+			readLoginInfo();
+			ss = (SSLServerSocket)ssf.createServerSocket(9097);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	}
+	
+	public static void main(String[] args) {
+		
+		Server server = new Server ("./res/common/key/serverKeys" , "123456".toCharArray(), 9995 );
+		
+		//is = new FileInputStream("./res/common/key/serverKeys");
+		//keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+		//KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+		//keystore.load(is, "123456".toCharArray());
+		//KeyManagerFactory kmf =   KeyManagerFactory.getInstance("SunX509", "SunJSSE");
+		//kmf.init(keystore, ("123456").toCharArray());
+		//SSLContext sc = SSLContext.getInstance("SSL");
+		//sc.init(kmf.getKeyManagers(), null, null);
+		//SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+		//SSLServerSocket ss = (SSLServerSocket)ssf.createServerSocket(9097);
+		
+		//System.out.println("Ready...");
 
-		FileInputStream is = new FileInputStream("./res/common/key/serverKeys");
-
-		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-		keystore.load(is, "123456".toCharArray());
-		KeyManagerFactory kmf =   KeyManagerFactory.getInstance("SunX509", "SunJSSE");
-		kmf.init(keystore, ("123456").toCharArray());
-		SSLContext sc = SSLContext.getInstance("SSL");
-		sc.init(kmf.getKeyManagers(), null, null);
-		SSLServerSocketFactory ssf = sc.getServerSocketFactory();
-		SSLServerSocket ss = (SSLServerSocket)ssf.createServerSocket(9097);
-		readLoginInfo();
-		System.out.println("Ready...");
-
+		/**
+		*
+		* Zrób z tego w¹tek
+		*/
 		while (true) {
-			new Server(ss.accept()).start();
-
+			//new Server(ss.accept()).start();
+			try {
+				new S2PConnection(server.ss.accept(), server);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
-	private static TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); 
-	private static TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); 
+//	loginInfo = new TreeSet<PeerLoginInfo>(); 
+//	peersInfo = new TreeSet<PeerInfo>(); 
 //	private static TreeMap<String , PeerLoginInfo > loginInfo = new TreeMap<String , PeerLoginInfo>(); 
 //	private static TreeMap<String, PeerInfo > peersInfo = new TreeMap<String, PeerInfo >(); 
+/*
 	private Socket sock;
 
 	private Server(Socket s) {
@@ -72,7 +109,7 @@ public class Server extends Thread {
 
 		}
 	}
-	
+*/	
 
 	/**
 	 * @TODO dodac sol do hasel
