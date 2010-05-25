@@ -41,4 +41,19 @@ public class PeerLoginInfo implements Serializable, Comparable<PeerLoginInfo> {
 	public int compareTo(PeerLoginInfo o) {
 		return this.login.compareTo(o.login);
 	}
+
+	/**
+	 * @return the login
+	 */
+	public String getLogin() {
+		return login;
+	}
+
+	/**
+	 * @return the passwdHash
+	 */
+	public byte[] getPasswdHash() {
+		return passwdHash;
+	}
+
 }

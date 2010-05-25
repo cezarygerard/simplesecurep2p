@@ -24,8 +24,8 @@ import common.PeerLoginInfo;
 
 public class Server {
 
-	private static TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); ; 
-	private static TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); ;
+	private TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); ; 
+	private TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); ;
 	private FileInputStream is ; 
 	private KeyStore keystore;
 	private KeyManagerFactory kmf;
@@ -85,7 +85,7 @@ public class Server {
 	/**
 	 * @TODO dodac sol do hasel
 	 */
-	private static void readLoginInfo(String peerLoginInfo)
+	private void readLoginInfo(String peerLoginInfo)
 	{
 		try {
 			System.out.println("readLoginInfo");
@@ -109,6 +109,16 @@ public class Server {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	boolean verifyPeer(PeerLoginInfo pli)
+	{
+		PeerLoginInfo pliAtServer= (loginInfo.subSet(pli, true, pli, true)).first();
+		if (pliAtServer != null && pliAtServer.getPasswdHash() == pli.getPasswdHash())
+			return true;
+		else
+			return false;
+				
 	}
 	
 }
