@@ -26,7 +26,7 @@ import common.PeerLoginInfo;
 public class Server {
 
 	private TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); ; 
-	TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>(); ;
+	TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>();
 	private FileInputStream is ; 
 	private KeyStore keystore;
 	private KeyManagerFactory kmf;
