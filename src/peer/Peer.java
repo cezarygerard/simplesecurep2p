@@ -51,28 +51,10 @@ public class Peer implements Runnable {
 			sc.init(null, tmf.getTrustManagers(), null);
 			this.sf = sc.getSocketFactory();
 			this.listeningPort = listeningPort;
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		
 	}
 	
@@ -87,6 +69,7 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("koniec");
 	}
 	
 	public void run() {
