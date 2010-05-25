@@ -83,8 +83,6 @@ public class S2PConnection extends Connection implements Runnable{
 
 			if(command.equals(P2SProtocol.LOGIN))
 			{
-				System.out.println("[S2PConnection.HandleCommand]");
-
 				PeerLoginInfo pli = (PeerLoginInfo)objInput.readObject();
 
 				if(this.server.verifyPeer(pli))
@@ -102,12 +100,15 @@ public class S2PConnection extends Connection implements Runnable{
 			} 
 			else if (loggedin != true)
 			{
+				
 				System.out.println("[S2PConnection.HandleCommand] wrong msg");
 				terminateConnection();
 			}
 			else if (command.equals(P2SProtocol.MYINFO))
 			{
+				System.out.println("[S2PConnection.HandleCommand] MYINFO");
 				PeerInfo pi = (PeerInfo) objInput.readObject();
+				System.out.println("[S2PConnection.HandleCommand] PeerInfo: " + pi);
 				server.peersInfo.add(pi);
 			}
 		}catch(Exception e){

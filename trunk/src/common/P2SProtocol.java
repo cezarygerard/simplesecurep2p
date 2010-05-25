@@ -11,7 +11,7 @@ public class P2SProtocol {
 	public static final String LOGIN = "login";
 	
 	//Server
-	public static final String LOGINACK = "logicack";
+	public static final String LOGINACK = "loginack";
 
 	//Server
 	public static final String LOGINFAILED = "loginfailed";
