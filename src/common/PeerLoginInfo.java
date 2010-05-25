@@ -2,26 +2,33 @@ package common;
 
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-
 
 /**
  * @author czarek
- *	
+ *	Klasa reprezentuje Informacje potrzebne do logowania.
+ *	Wykorzystywana zarowno w klasie Server jak i Peer
  */
 public class PeerLoginInfo implements Serializable, Comparable<PeerLoginInfo> {
 
-	@Override
-	public String toString() {
-		return "PeerLoginInfo [login=" + login + ", passwdHash="
-				+ passwdHash + "]";
-	}
-
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 *  Login uzytkownika
+	 */
 	String login;
+	
+	/**
+	 * Skrot z hasla, uzywamy tu sha-512
+	 */
 	String passwdHash;
-	
-	
+
+	/**
+	 * Konstruktor
+	 * @param login
+	 * @param passwd
+	 * @param hashed parametr pokazuje czy haslo jest juz zahaszowane czy trzeba jeszcze obliczyc skrot
+	 * 		Uzytkownik podaje haslo plain textem, liczmy skrot, serwer przechowuje tylko skroty
+	 */
 	public PeerLoginInfo(String login, String passwd, boolean hashed) {
 		super();
 		this.login = login;
@@ -38,6 +45,10 @@ public class PeerLoginInfo implements Serializable, Comparable<PeerLoginInfo> {
 		}
 	}
 	
+	/**
+	 * Medota sluzy do porywnywania roznych obiektow klasy PeerInfo
+	 * Jest wykorzystywana do ukladania ich w kontenerach
+	 */
 	public int compareTo(PeerLoginInfo o) {
 		return this.login.compareTo(o.login);
 	}
@@ -55,5 +66,12 @@ public class PeerLoginInfo implements Serializable, Comparable<PeerLoginInfo> {
 	public String getPasswdHash() {
 		return passwdHash;
 	}
+	
+	@Override
+	public String toString() {
+		return "PeerLoginInfo [login=" + login + ", passwdHash="
+				+ passwdHash + "]";
+	}
+
 
 }

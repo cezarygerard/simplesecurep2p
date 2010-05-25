@@ -4,6 +4,7 @@ package common;
  * @author czarek
  * @TODO moze warto przerobic na protokol numerkowy tak, aby uzywac switch
  * 
+ * Protokol komunikacji peera z serwerem
  */
 public class P2SProtocol {
 	

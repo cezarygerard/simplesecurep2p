@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.security.KeyStore;
-import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
@@ -16,7 +18,6 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import common.PeerInfo;
 import common.PeerLoginInfo;
-import common.utils;
 
 /**
  * @author czarek
@@ -69,15 +70,16 @@ public class Server {
 		 */
 		System.out.println(server.ss.getLocalSocketAddress() + "  "+ server.ss.getLocalPort());
 		
+	
+		
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
 				System.out.println("serwer czeka");
 				new S2PConnection(server.ss.accept(), server);
 				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 		}
 	}

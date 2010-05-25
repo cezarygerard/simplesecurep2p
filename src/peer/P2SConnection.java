@@ -1,16 +1,11 @@
 package peer;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Timer;
 import java.util.TreeSet;
 
 import javax.net.ssl.HandshakeCompletedEvent;
@@ -24,7 +19,7 @@ import common.PeerInfo;
 public class P2SConnection extends Connection implements Runnable {
 
 	private Peer peer;
-	private String hostname;
+	private InetAddress addr;
 	private int port;
 	private STATE state;
 
@@ -32,9 +27,9 @@ public class P2SConnection extends Connection implements Runnable {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
 	}
 
-	P2SConnection(Peer p,String hostname, int port)
+	P2SConnection(Peer p,InetAddress addr, int port)
 	{
-		this.hostname = hostname;
+		this.addr = addr;
 		this.port = port;
 		this.peer = p;
 	}
@@ -43,7 +38,7 @@ public class P2SConnection extends Connection implements Runnable {
 	{
 
 		//s = (SSLSocket) peer.sf.createSocket(hostname, port);
-		socket = (SSLSocket) peer.sf.createSocket(InetAddress.getByName("192.168.1.4"), port);
+		socket = (SSLSocket) peer.sf.createSocket(addr, port);
 		
 		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
 		{
