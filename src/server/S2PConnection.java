@@ -37,7 +37,7 @@ public class S2PConnection implements Runnable{
 		server =serv;
 		try {
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		output = new PrintWriter(socket.getOutputStream());
+		output = new PrintWriter(socket.getOutputStream(), true);
 	
 
 		objOutput = new ObjectOutputStream(socket.getOutputStream());
@@ -78,8 +78,7 @@ public class S2PConnection implements Runnable{
 
 	private void HandleCommand(String command) {
 		// TODO Auto-generated method stub
-		System.out.println("[S2PConnection.HandleCommand] " + command);
-		send("TWOJA STARA");
+		System.out.println("[P2SConnection.HandleCommand] command: " + command);
 	/*	
 		try {
 			PeerLoginInfo pli = (PeerLoginInfo)objInput.readObject();
@@ -108,5 +107,5 @@ public class S2PConnection implements Runnable{
 				e.printStackTrace();
 			}
 	}
-	
+
 }

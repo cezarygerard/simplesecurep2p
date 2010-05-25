@@ -55,7 +55,7 @@ public class P2SConnection implements Runnable {
 		//s.startHandshake();
 
 		input = new BufferedReader(new InputStreamReader(s.getInputStream()));
-		output = new PrintWriter(s.getOutputStream());	
+		output = new PrintWriter(s.getOutputStream(), true);	
 
 		objOutput = new ObjectOutputStream(s.getOutputStream());
 		objInput = new ObjectInputStream (s.getInputStream());
@@ -87,14 +87,15 @@ public class P2SConnection implements Runnable {
 	}
 
 	private void HandleCommand(String command) {
-		System.out.println(command);
-		send("HELLO");
+		System.out.println("[P2SConnection.HandleCommand] command: " + command);
 
 	}
 
 	private void send(String command) {
 		if (output != null)
+		{
 			output.println(command);
+		}
 	}
 
 	private void send(Object obj) {
@@ -106,6 +107,10 @@ public class P2SConnection implements Runnable {
 				e.printStackTrace();
 			}
 	}
-
+	
+	protected void finalize() 
+	{
+		System.out.println("[P2SConnection.finalize]");
+	}
 }
 
