@@ -72,7 +72,8 @@ public class P2SConnection implements Runnable {
 	}
 
 	public void run() {
-		while (true)
+		boolean quit = false;
+		while (!quit)
 		{
 			try {
 				System.out.println("P2SConnection");
@@ -82,6 +83,7 @@ public class P2SConnection implements Runnable {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				quit = true;
 			}
 		}
 	}
