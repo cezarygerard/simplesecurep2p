@@ -16,6 +16,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import common.PeerInfo;
 import common.PeerLoginInfo;
+import common.utils;
 
 /**
  * @author czarek
@@ -101,21 +102,8 @@ public class Server {
 				st = new StringTokenizer(line);
 				if((st.countTokens() )!= 2)
 					throw new Exception("Ivalid peerLoginInfo.dat file");
-				String login = st.nextToken();
-				String hash =  st.nextToken();
-				byte [] realHash = new byte [hash.length()/2]; 
-				System.out.println("[Server.readLoginInfo()] " + hash.length());
-				
-				for(int i = 0 ; i < hash.length();)
-				{
-					realHash[i/2] = (byte)(( Character.digit(hash.charAt(i), 16) << 4 )+ Character.digit(hash.charAt(i +1), 16));
-				//	Byte b = new Byte(hash.substring(i, i+1)));
-					//realHash[i] = b.byteValue();
-					i +=2;
-					
-				}
-				loginInfo.add(new PeerLoginInfo(login, realHash));
-				System.out.println("[Server.readLoginInfo()] hash" + hash + " " + realHash);
+	
+				loginInfo.add(new PeerLoginInfo(st.nextToken(), st.nextToken(), true));
 			}
 			System.out.println("[Server.readLoginInfo()] " + loginInfo);
 
@@ -127,7 +115,7 @@ public class Server {
 	boolean verifyPeer(PeerLoginInfo pli)
 	{
 		PeerLoginInfo pliAtServer= (loginInfo.subSet(pli, true, pli, true)).first();
-		if (pliAtServer != null && Arrays.equals(pliAtServer.getPasswdHash(),  pli.getPasswdHash()))
+		if (pliAtServer != null && (pliAtServer.getPasswdHash()).equals(pli.getPasswdHash()))
 			return true;
 		else
 			return false;			

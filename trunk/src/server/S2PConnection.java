@@ -109,8 +109,12 @@ public class S2PConnection extends Connection implements Runnable{
 				System.out.println("[S2PConnection.HandleCommand] MYINFO");
 				PeerInfo pi = (PeerInfo) objInput.readObject();
 				System.out.println("[S2PConnection.HandleCommand] PeerInfo: " + pi);
-				server.peersInfo.add(pi);
-				
+				server.peersInfo.add(pi);				
+			}
+			else if (command.equals(P2SProtocol.GETPEERSINFO))
+			{
+				send(P2SProtocol.PEERSINFO);
+				send(server.peersInfo);
 			}
 			
 		}catch(Exception e){

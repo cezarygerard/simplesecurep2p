@@ -39,9 +39,9 @@ public class Peer implements Runnable {
 	private KeyStore keystore;
 	private TrustManagerFactory tmf;
 	private SSLContext sc;
-	private SSLSocketFactory sf;
+	SSLSocketFactory sf;
 	private int listeningPort;
-	private PeerLoginInfo peerLogin;
+	PeerLoginInfo peerLogin;
 	PeerInfo myInfo;
 	
 	public Peer(String keystore,  char[] kestorePass, int listeningPort)
@@ -68,7 +68,7 @@ public class Peer implements Runnable {
 
 		Peer p = new Peer("./res/common/key/serverKeys" , "123456".toCharArray(), 9795);
 		P2SConnection p2s = new P2SConnection(p, "localhost", 9995);
-		p.peerLogin = new PeerLoginInfo("czarek", "12345");
+		p.peerLogin = new PeerLoginInfo("czarek", "12345", false);
 		try {
 			p2s.Connect();
 		} catch (Exception e) {
