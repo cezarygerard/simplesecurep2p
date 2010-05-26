@@ -6,6 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.PrintWriter;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.net.ssl.SSLSocket;
 
@@ -41,6 +42,8 @@ public abstract class Connection implements Runnable {
 	 * timer do mierzenia timeoutow
 	 */
 	protected Timer timer;
+	protected TimerTask timeoutTask;
+	
 	/**
 	 * flaga zamykajaca polaczenie (konczy petle w metodzie run)
 	 * nie powinna byc zmieniana bezposrednio
@@ -69,11 +72,25 @@ public abstract class Connection implements Runnable {
 		
 	}
 
+	protected void setTimeout(int time)
+	{
+		timeoutTask = new TimerTask() {
+			
+			@Override
+			public void run() {
+				send(P2SProtocol.TIMEOUT);
+				terminateConnectionWithFailure();
+			}
+		};
+		timer.schedule(timeoutTask, time);
+	}
+	
 	/**
 	 * wyslanie komendy
 	 */
 	protected void send(String command) {
-        if (output != null)
+		setTimeout(10000);
+		if (output != null)
             output.println(command);
     }
 
@@ -93,10 +110,24 @@ public abstract class Connection implements Runnable {
 	/**
 	 * zakonczenie polaczenia
 	 */
-	protected void terminateConnection()
+	protected void terminateConnectionWithFailure()
 	{
 		send(P2SProtocol.FAILURE);
 		send(P2SProtocol.EXIT);
+		close = true;
+		closeConnection();		
+	}
+	protected void terminateConnectionGently()
+	{
+		send(P2SProtocol.OK);
+		send(P2SProtocol.EXIT);
+		close = true;
+		closeConnection();
+	}
+	
+	private void closeConnection()
+	{
+		System.out.println(this + "closeConnection");
 		close = true;
 		try {
 			thread.join(1000);
@@ -105,7 +136,6 @@ public abstract class Connection implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 }

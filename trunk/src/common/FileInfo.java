@@ -2,6 +2,7 @@ package common;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.StringTokenizer;
 
 /**
  * @author czarek
@@ -9,9 +10,16 @@ import java.io.Serializable;
  */
 public class FileInfo implements Serializable{
 	
-	public FileInfo(String name, String desc, long size) {
+	public FileInfo(String nameWithType, String desc, long size) {
 		super();
-		this.name = name;
+		StringTokenizer st = new StringTokenizer(nameWithType, ".");
+		String nameWithoutType = new String();
+		for (int i = 0 ; i < st.countTokens() -1; i++)
+		{
+			nameWithoutType += st.nextToken();
+		}
+		this.name = nameWithoutType;
+		this.type = st.nextToken();
 		this.desc = desc;
 		this.size = size;
 	}
@@ -22,6 +30,7 @@ public class FileInfo implements Serializable{
 	private static final long serialVersionUID = 1L;
 	String name;
 	String desc;
+	String type;
 	long size;
 	transient File file;
 
