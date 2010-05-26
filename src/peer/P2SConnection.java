@@ -48,7 +48,7 @@ public class P2SConnection extends Connection implements Runnable {
 		//s.startHandshake();
 		
 		//to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania - wiemy jakie gniazdko dostaniemy od systemu
-		peer.myInfo = new PeerInfo(socket.getInetAddress(), 9998);
+		peer.myInfo = new PeerInfo(socket.getInetAddress(), peer.listeningPort);
 		
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);	
@@ -74,7 +74,6 @@ public class P2SConnection extends Connection implements Runnable {
 				System.out.println("P2SConnection");
 				String command = input.readLine();
 				HandleCommand(command);
-				Thread.sleep(1000);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -87,7 +86,7 @@ public class P2SConnection extends Connection implements Runnable {
 		try
 		{
 			System.out.println("[P2SConnection.HandleCommand] command: " + command);
-
+			//timeoutTask.cancel();
 			if ((state == STATE.LOGGING && command.equals(P2SProtocol.LOGINACK)) || command.equals(P2SProtocol.GETYOURINFO))
 			{
 				System.out.println("[P2SConnection.HandleCommand.HandleCommand] MYINFO sending");
@@ -95,22 +94,29 @@ public class P2SConnection extends Connection implements Runnable {
 				send(P2SProtocol.MYINFO);
 				send(peer.myInfo);
 				send(P2SProtocol.GETPEERSINFO);
-			}else
-			
-			if(command.equals(P2SProtocol.PEERSINFO))
+			}
+			else if(command.equals(P2SProtocol.PEERSINFO))
 			{
 				System.out.println("[P2SConnection.HandleCommand] PEERSINFO");
 				TreeSet<PeerInfo> pi = (TreeSet<PeerInfo>) objInput.readObject();
 				peer.peersInfo = pi;
 				System.out.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: " + pi);
+				send(P2SProtocol.GETCERT);
+				send(peer.certInfo);
 			}
-			
-			
+			else if  (command.equals(P2SProtocol.CERT))
+			{
+				//objInput.readObject(); certyfikat
+				terminateConnectionGently();
+			}
+			else if  (command.equals(P2SProtocol.EXIT))
+			{
+				terminateConnectionGently();
+			}
 		}
 		catch(Exception e){
-			e.printStackTrace();
-			
-			terminateConnection();
+			e.printStackTrace();			
+			terminateConnectionWithFailure();
 		}
 	}
 }

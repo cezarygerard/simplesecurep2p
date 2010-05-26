@@ -15,7 +15,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 import common.PeerInfo;
 import common.PeerLoginInfo;
 import common.utils;
@@ -38,6 +38,7 @@ public class Server {
 	private SSLServerSocket ss;
 	private STATE state;
 	
+
 	public enum STATE {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
 	}
@@ -55,6 +56,21 @@ public class Server {
 			ssf = sc.getServerSocketFactory();
 			readLoginInfo("./res/server/peerLoginInfo.dat");
 			ss = (SSLServerSocket)ssf.createServerSocket(listeningPort);
+			Enumeration<String> en = keystore.aliases();
+
+			   for (; en.hasMoreElements(); ) {
+			        String alias = (String)en.nextElement();
+
+			        // Does alias refer to a private key?
+			        boolean b = keystore.isKeyEntry(alias);
+
+			        // Does alias refer to a trusted certificate?
+			        b = keystore.isCertificateEntry(alias);
+			       
+			        b = false;
+			    }
+
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,7 +80,8 @@ public class Server {
 	public static void main(String[] args) {
 
 		Server server = new Server ("./res/common/key/serverKeys" , "123456".toCharArray(), 9995 );
-
+		//Server server = new Server ("./res/server/key/serverKeys" , "123456".toCharArray(), 9995 );
+	//	Server server = new Server ("./res/server/key/serverKeys" , "123456".toCharArray(), 9995 );
 	/*	utils.printInterfaces();
 		try {
 			Thread.sleep(10000);
@@ -81,7 +98,7 @@ public class Server {
 			try {
 				System.out.println("serwer czeka");
 				new S2PConnection(server.ss.accept(), server);
-				
+				Thread.sleep(10000);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}

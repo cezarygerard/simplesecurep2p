@@ -26,9 +26,12 @@ public class P2SProtocol {
 	//Peer
 	public static final String GETCERT = "getcert";
 	
+	//Peer
+	public static final String CERTINFO = "certINFO";
+	
 	//Server
 	public static final String CERT = "cert";
-		
+	
 	//Peer
 	public static final String GETPEERSINFO = "getpeersinfo";
 		
@@ -37,6 +40,10 @@ public class P2SProtocol {
 	
 	//Peer or Server
 	public static final String FAILURE = "failure";
+	
+	//Peer or Server
+	public static final String OK = "ok";
+	
 	
 	//Peer or Server
 	public static final String TIMEOUT = "timeout";

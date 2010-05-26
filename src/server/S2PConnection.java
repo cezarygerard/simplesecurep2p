@@ -10,6 +10,7 @@ import java.net.Socket;
 
 import javax.net.ssl.SSLSocket;
 
+import common.CertInfo;
 import common.Connection;
 import common.P2SProtocol;
 import common.PeerInfo;
@@ -27,18 +28,14 @@ public class S2PConnection extends Connection implements Runnable{
 	private enum STATE {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
 	}
-
+	
+	
+	
 	S2PConnection(Socket accept, Server serv) {
 		super();
 		this.socket = (SSLSocket) accept;
 		System.out.println(socket.getRemoteSocketAddress());
 		System.out.println(socket.getLocalSocketAddress());
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		server =serv;
 		try {
 			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -66,7 +63,6 @@ public class S2PConnection extends Connection implements Runnable{
 				System.out.println("[S2PConnection.run] waiting for msg");
 				String command = input.readLine();
 				HandleCommand(command);
-				Thread.sleep(1000);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -76,7 +72,7 @@ public class S2PConnection extends Connection implements Runnable{
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-					terminateConnection();
+					terminateConnectionWithFailure();
 				}
 			}
 		}
@@ -86,7 +82,7 @@ public class S2PConnection extends Connection implements Runnable{
 	protected void HandleCommand(String command) {
 		try{
 			System.out.println("[S2PConnection.HandleCommand] command: " + command);
-
+			timeoutTask.cancel();
 			if(command.equals(P2SProtocol.LOGIN))
 			{
 				PeerLoginInfo pli = (PeerLoginInfo)objInput.readObject();
@@ -101,14 +97,14 @@ public class S2PConnection extends Connection implements Runnable{
 				{
 					System.out.println("[S2PConnection.HandleCommand] LOGINFAILED");
 					send(P2SProtocol.LOGINFAILED);
-					terminateConnection();
+					terminateConnectionWithFailure();
 				}
 			} 
 			else if (loggedin != true)
 			{
 				
 				System.out.println("[S2PConnection.HandleCommand] wrong msg");
-				terminateConnection();
+				terminateConnectionWithFailure();
 			}
 			else if (command.equals(P2SProtocol.MYINFO))
 			{
@@ -122,10 +118,21 @@ public class S2PConnection extends Connection implements Runnable{
 				send(P2SProtocol.PEERSINFO);
 				send(server.peersInfo);
 			}
+			else if (command.equals(P2SProtocol.GETCERT))
+			{
+				CertInfo ci = (CertInfo) objInput.readObject();
+				send(P2SProtocol.CERT);
+				//send(certyfikat)
+				terminateConnectionGently();
+			}
+			else if  (command.equals(P2SProtocol.EXIT))
+			{
+				terminateConnectionGently();
+			}
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			terminateConnection();
+			terminateConnectionWithFailure();
 		}
 
 	}

@@ -7,9 +7,12 @@ import java.security.KeyStore;
 import java.util.TreeSet;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import common.CertInfo;
 import common.PeerInfo;
 import common.PeerLoginInfo;
 
@@ -25,9 +28,14 @@ public class Peer implements Runnable {
 	private TrustManagerFactory tmf;
 	private SSLContext sc;
 	SSLSocketFactory sf;
-	private int listeningPort;
+	int listeningPort;
 	PeerLoginInfo peerLogin;
 	PeerInfo myInfo;
+	CertInfo certInfo;
+	
+	///elementy potrzebne do nasluchowania
+	private SSLServerSocketFactory ssf;
+	private SSLServerSocket ss;
 	
 	public Peer(String keystore,  char[] kestorePass, int listeningPort)
 	{
@@ -41,7 +49,10 @@ public class Peer implements Runnable {
 			this.sc.init(null, tmf.getTrustManagers(), null);
 			this.sf = sc.getSocketFactory();
 			this.listeningPort = listeningPort;
-		//	this.myInfo = new PeerInfo(InetAddress.getByName("192.168.1.4"), 9998);
+			this.ssf = sc.getServerSocketFactory();
+			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
+			this.certInfo = new CertInfo();
+		//	this.myInfo = new PeerInfo(this.ss.getInetAddress(), this.listeningPort);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -63,9 +74,8 @@ public class Peer implements Runnable {
 		
 		while(true)
 		{
-			System.out.println("[Peer.main()] koniec");
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -74,7 +84,16 @@ public class Peer implements Runnable {
 	}
 	
 	public void run() {
-
+		while (true) {
+			//new Server(ss.accept()).start();
+			try {
+				System.out.println("serwer czeka");
+				new P2PConnection(this.ss.accept(), this);
+				
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 	
 
