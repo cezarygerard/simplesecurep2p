@@ -57,14 +57,12 @@ public class P2SConnection extends Connection implements Runnable {
 		objOutput = new ObjectOutputStream(socket.getOutputStream());
 		objInput = new ObjectInputStream (socket.getInputStream());
 	
-		thread.start();
-		
 		state = STATE.LOGGING;
 		System.out.println("[P2SConnection.Connect()] ");
 		send(P2SProtocol.LOGIN);
 		send(peer.peerLogin);
 		thread = new Thread(this);
-		
+		thread.start();		
 
 	}
 

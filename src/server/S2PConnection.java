@@ -13,7 +13,6 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLSocket;
 import javax.security.auth.x500.X500Principal;
 
-import common.CertInfo;
 import common.Connection;
 import common.P2SProtocol;
 import common.Pair;
@@ -27,13 +26,7 @@ import common.PeerLoginInfo;
 public class S2PConnection extends Connection implements Runnable{
 
 	Server server;
-	private STATE state;
 	private boolean loggedin;
-	private enum STATE {
-		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
-	}
-	
-	
 	
 	S2PConnection(Socket accept, Server serv) {
 		super();
