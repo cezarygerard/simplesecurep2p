@@ -89,7 +89,7 @@ public abstract class Connection implements Runnable {
 	 * wyslanie komendy
 	 */
 	protected void send(String command) {
-		setTimeout(10000);
+		//setTimeout(10000);
 		if (output != null)
             output.println(command);
     }

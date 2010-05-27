@@ -82,7 +82,7 @@ public class S2PConnection extends Connection implements Runnable{
 	protected void HandleCommand(String command) {
 		try{
 			System.out.println("[S2PConnection.HandleCommand] command: " + command);
-			timeoutTask.cancel();
+			//timeoutTask.cancel();
 			if(command.equals(P2SProtocol.LOGIN))
 			{
 				PeerLoginInfo pli = (PeerLoginInfo)objInput.readObject();
@@ -125,7 +125,7 @@ public class S2PConnection extends Connection implements Runnable{
 				//send(certyfikat)
 				terminateConnectionGently();
 			}
-			else if  (command.equals(P2SProtocol.EXIT))
+			else if (command.equals(P2SProtocol.EXIT))
 			{
 				terminateConnectionGently();
 			}

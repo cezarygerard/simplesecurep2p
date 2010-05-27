@@ -3,7 +3,7 @@ package common;
 /**
  * @author czarek
  * @TODO moze warto przerobic na protokol numerkowy tak, aby uzywac switch
- * 
+ * @TODO wydzielic klase bazowa z protokolem P2P 
  * Protokol komunikacji peera z serwerem
  */
 public class P2SProtocol {

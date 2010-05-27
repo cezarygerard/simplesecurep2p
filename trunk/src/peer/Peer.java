@@ -62,7 +62,7 @@ public class Peer implements Runnable {
 	
 	public static void main(String[] args) throws UnknownHostException {
 
-		Peer p = new Peer("./res/common/key/serverKeys" , "123456".toCharArray(), 9795);
+		Peer p = new Peer("./res/peer/key/peerTrustedKeys" , "123456".toCharArray(), 9795);
 		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.1.3"), 9995);
 		p.peerLogin = new PeerLoginInfo("czarek", "12345", false);
 		try {
