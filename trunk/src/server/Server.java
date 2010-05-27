@@ -1,8 +1,11 @@
 package server;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.NetworkInterface;
@@ -13,6 +16,7 @@ import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -80,6 +84,7 @@ public class Server {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(1);
 		}	
 	}
 
@@ -158,7 +163,6 @@ public class Server {
 
 	/**
 	 * Generowanie certyfikatu x509
-	 * @param pair para kluczy dla tego certyfikatu
 	 * @param certInfo informacje ktore maja znalezc sie w certyfikacie
 	 * @return
 	 * @throws InvalidKeyException
@@ -168,20 +172,26 @@ public class Server {
 	 * @throws IllegalStateException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public X509Certificate generateV3Certificate(KeyPair pair, CertInfo certInfo) throws InvalidKeyException,
-	NoSuchProviderException, SignatureException, CertificateEncodingException, IllegalStateException, NoSuchAlgorithmException {
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
+	public common.Pair<X509Certificate, KeyPair> generateV3Certificate(X500Principal certInfo) throws InvalidKeyException,
+	NoSuchProviderException, SignatureException, CertificateEncodingException, IllegalStateException, NoSuchAlgorithmException,KeyStoreException {
+		KeyPairGenerator keyGen;
+		keyGen = KeyPairGenerator.getInstance("DSA");	
+		keyGen.initialize(1024);
+		KeyPair keyPair = keyGen.generateKeyPair(); 
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());		
 		X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-
 		certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
-		certGen.setIssuerDN(new X500Principal("CN=Test Certificate"));
-		certGen.setNotBefore(new Date(System.currentTimeMillis() - 1000000));
-		certGen.setNotAfter(new Date(System.currentTimeMillis() + 1000000));
-		certGen.setSubjectDN(new X500Principal("CN=Test Certificate"));
-		certGen.setPublicKey(pair.getPublic());
+		X500Principal x = ((X509Certificate)this.keystore.getCertificate("servertrustedcert")).getSubjectX500Principal();
+		X500Principal x1 = ((X509Certificate)this.keystore.getCertificate("servertrustedcert")).getIssuerX500Principal();
+		certGen.setIssuerDN(((X509Certificate)this.keystore.getCertificate("servertrustedcert")).getSubjectX500Principal());	
+		certGen.setNotBefore(new Date(System.currentTimeMillis() - 7*24*3600*1000));
+		certGen.setNotAfter(new Date(System.currentTimeMillis() +  7*24*3600*1000));
+		certGen.setSubjectDN(certInfo);
+		certGen.setPublicKey(keyPair.getPublic());
 		certGen.setSignatureAlgorithm("SHA1withDSA");
-		return certGen.generate(this.caPrivKey);
+		
+		//return new Pair(certGen.generate(this.caPrivKey), keyPair);
+		return new common.Pair<X509Certificate, KeyPair>(certGen.generate(this.caPrivKey), keyPair);
 	}
 }
 

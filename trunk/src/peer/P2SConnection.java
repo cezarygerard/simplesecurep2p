@@ -6,6 +6,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.security.KeyPair;
+import java.security.cert.X509Certificate;
 import java.util.TreeSet;
 
 import javax.net.ssl.HandshakeCompletedEvent;
@@ -38,7 +40,6 @@ public class P2SConnection extends Connection implements Runnable {
 	{
 
 		socket = (SSLSocket) peer.sf.createSocket(addr, port);
-		
 		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
 		{
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {
@@ -49,21 +50,21 @@ public class P2SConnection extends Connection implements Runnable {
 		
 		//to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania - wiemy jakie gniazdko dostaniemy od systemu
 		peer.myInfo = new PeerInfo(socket.getInetAddress(), peer.listeningPort);
-		
+
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);	
 
 		objOutput = new ObjectOutputStream(socket.getOutputStream());
 		objInput = new ObjectInputStream (socket.getInputStream());
-
-		send(P2SProtocol.LOGIN);
-
-		send(peer.peerLogin);
-
-		thread = new Thread(this);
+	
 		thread.start();
+		
 		state = STATE.LOGGING;
 		System.out.println("[P2SConnection.Connect()] ");
+		send(P2SProtocol.LOGIN);
+		send(peer.peerLogin);
+		thread = new Thread(this);
+		
 
 	}
 
@@ -101,12 +102,19 @@ public class P2SConnection extends Connection implements Runnable {
 				TreeSet<PeerInfo> pi = (TreeSet<PeerInfo>) objInput.readObject();
 				peer.peersInfo = pi;
 				System.out.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: " + pi);
-				send(P2SProtocol.GETCERT);
-				send(peer.certInfo);
+				if(!peer.hasValidCert)
+				{
+					send(P2SProtocol.GETCERT);
+					send(peer.certInfo);
+				}
+				else
+				{
+					terminateConnectionGently();
+				}
 			}
 			else if  (command.equals(P2SProtocol.CERT))
 			{
-				//objInput.readObject(); certyfikat
+				peer.storeX509cert((X509Certificate)objInput.readObject(), (KeyPair)objInput.readObject());			
 				terminateConnectionGently();
 			}
 			else if  (command.equals(P2SProtocol.EXIT))
