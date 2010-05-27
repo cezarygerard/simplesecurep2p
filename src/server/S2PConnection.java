@@ -7,12 +7,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.KeyPair;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLSocket;
+import javax.security.auth.x500.X500Principal;
 
 import common.CertInfo;
 import common.Connection;
 import common.P2SProtocol;
+import common.Pair;
 import common.PeerInfo;
 import common.PeerLoginInfo;
 
@@ -120,9 +124,11 @@ public class S2PConnection extends Connection implements Runnable{
 			}
 			else if (command.equals(P2SProtocol.GETCERT))
 			{
-				CertInfo ci = (CertInfo) objInput.readObject();
+				X500Principal ci = (X500Principal ) objInput.readObject();
 				send(P2SProtocol.CERT);
-				//send(certyfikat)
+				Pair<X509Certificate, KeyPair> p = server.generateV3Certificate(ci);
+				send(p.getFirst());
+				send(p.getSecond());
 				terminateConnectionGently();
 			}
 			else if (command.equals(P2SProtocol.EXIT))
