@@ -11,7 +11,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Date;
 import java.util.TreeSet;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -22,7 +21,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.auth.x500.X500Principal;
 
-import common.CertInfo;
 import common.PeerInfo;
 import common.PeerLoginInfo;
 
@@ -135,10 +133,8 @@ public class Peer implements Runnable {
 	public void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {
 		Certificate [] chain =  {cert};
 		this.myKeystore.setKeyEntry("peerPrivKey", keyPair.getPrivate(), "123456".toCharArray(),chain);
-		boolean wtf = this.myKeystore.isKeyEntry("peerPrivKey");
 		X509Certificate c = (X509Certificate) myKeystore.getCertificate("peerPrivKey");
 		hasValidCert = (c.getNotAfter().getTime() > System.currentTimeMillis() + 24 * 3600 * 1000);
-		System.out.println(hasValidCert);
 	}
 	
 

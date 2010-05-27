@@ -1,18 +1,10 @@
 package server;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -22,11 +14,9 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.SignatureException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
-import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
@@ -36,13 +26,10 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
-import common.CertInfo;
 import common.PeerInfo;
 import common.PeerLoginInfo;
-import common.utils;
 
 /**
  * @author czarek
@@ -60,7 +47,6 @@ public class Server {
 	private SSLContext sc;
 	private SSLServerSocketFactory ssf;
 	private SSLServerSocket ss;
-	private STATE state;
 	PrivateKey caPrivKey;
 	public enum STATE {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
@@ -92,16 +78,7 @@ public class Server {
 
 
 		Server server = new Server ("./res/server/key/serverKeys" , "123456".toCharArray(), 9995 );
-		/*
-		KeyPairGenerator keyGen;
-		keyGen = KeyPairGenerator.getInstance("DSA");	
-		keyGen.initialize(1024);
-		KeyPair kp = keyGen.generateKeyPair();
-		X509Certificate x = server.generateV3Certificate(kp, new CertInfo());
-		Certificate [] chain =  {x};
-		server.keystore.setKeyEntry("new", kp.getPrivate(), "123456".toCharArray(),chain);
-		boolean wtf = server.keystore.isKeyEntry("new");
-		*/
+
 		/**
 		 * Zrob z tego w¹tek
 		 */
@@ -181,8 +158,6 @@ public class Server {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());		
 		X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
 		certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
-		X500Principal x = ((X509Certificate)this.keystore.getCertificate("servertrustedcert")).getSubjectX500Principal();
-		X500Principal x1 = ((X509Certificate)this.keystore.getCertificate("servertrustedcert")).getIssuerX500Principal();
 		certGen.setIssuerDN(((X509Certificate)this.keystore.getCertificate("servertrustedcert")).getSubjectX500Principal());	
 		certGen.setNotBefore(new Date(System.currentTimeMillis() - 7*24*3600*1000));
 		certGen.setNotAfter(new Date(System.currentTimeMillis() +  7*24*3600*1000));
