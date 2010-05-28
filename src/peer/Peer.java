@@ -27,7 +27,8 @@ import common.PeerLoginInfo;
 
 /**
  * @author czarek
- * TODO ta klasa powinna byc singletonem
+ * @TODO ta klasa powinna byc singletonem
+ * @TODO Wybrac waska grupe akceptowanych szyfrowan w polaczeniach
  */
 public class Peer implements Runnable {
 
@@ -82,8 +83,12 @@ public class Peer implements Runnable {
 			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 			this.sf = sc.getSocketFactory();
 			this.listeningPort = listeningPort;
-			this.ssf = sc.getServerSocketFactory();
-			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
+	//		this.ssf = sc.getServerSocketFactory();
+	//		this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
+			
+//			ss.setNeedClientAuth(true);			
+//			ss.setWantClientAuth(true);
+			
 			String s = (new BufferedReader(new FileReader(new File("./res/peer/key/principals"))).readLine());
 			this.certInfo = new X500Principal(s);
 		//	this.myInfo = new PeerInfo(this.ss.getInetAddress(), this.listeningPort);
@@ -105,6 +110,8 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	//	(new Thread(p)).start();
+		
 		
 		while(true)
 		{
@@ -121,22 +128,37 @@ public class Peer implements Runnable {
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
-				System.out.println("serwer czeka");
+				for (int i = 0; i < this.ss.getEnabledCipherSuites().length; i++) {
+					System.out.println(this.ss.getEnabledCipherSuites()[i]);
+				}
 				new P2PConnection(this.ss.accept(), this);
-			
+				
 			} catch (Exception e1) {
 				e1.printStackTrace();
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
 
 	public void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {
-		Certificate [] chain =  {cert};
-		this.myKeystore.setKeyEntry("peerPrivKey", keyPair.getPrivate(), "123456".toCharArray(),chain);
-		X509Certificate c = (X509Certificate) myKeystore.getCertificate("peerPrivKey");
-		hasValidCert = (c.getNotAfter().getTime() > System.currentTimeMillis() + 24 * 3600 * 1000);
+		try {
+			Certificate [] chain =  {cert};
+			this.myKeystore.setKeyEntry("peerPrivKey", keyPair.getPrivate(), "123456".toCharArray(),chain);
+			X509Certificate c = (X509Certificate) myKeystore.getCertificate("peerPrivKey");
+			this.kmf.init(myKeystore, "123456".toCharArray());
+			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+			this.ssf = sc.getServerSocketFactory();
+			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
+			ss.setWantClientAuth(true);
+			hasValidCert = (c.getNotAfter().getTime() > System.currentTimeMillis() + 24 * 3600 * 1000);
+		}catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
-	
-
-
 }
