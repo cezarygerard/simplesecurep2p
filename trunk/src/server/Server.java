@@ -33,8 +33,8 @@ import common.PeerLoginInfo;
 
 /**
  * @author czarek
- * TODO ta klasa powinna byc singletonem
- * TODO zaimplementowa
+ * @TODO ta klasa powinna byc singletonem
+ * @TODO Wybrac waska grupe akceptowanych szyfrowan w polaczeniach
  */
 
 public class Server {
@@ -78,7 +78,11 @@ public class Server {
 
 
 		Server server = new Server ("./res/server/key/serverKeys" , "123456".toCharArray(), 9995 );
-
+		System.out.println(server.sc.getProvider());
+		System.out.println(server.ss.getEnabledCipherSuites());
+		for (int i = 0; i < server.ss.getEnabledCipherSuites().length; i++) {
+			System.out.println(server.ss.getEnabledCipherSuites()[i]);
+		}
 		/**
 		 * Zrob z tego w¹tek
 		 */
@@ -152,7 +156,7 @@ public class Server {
 	public common.Pair<X509Certificate, KeyPair> generateV3Certificate(X500Principal certInfo) throws InvalidKeyException,
 	NoSuchProviderException, SignatureException, CertificateEncodingException, IllegalStateException, NoSuchAlgorithmException,KeyStoreException {
 		KeyPairGenerator keyGen;
-		keyGen = KeyPairGenerator.getInstance("DSA");	
+		keyGen = KeyPairGenerator.getInstance("RSA");	
 		keyGen.initialize(1024);
 		KeyPair keyPair = keyGen.generateKeyPair(); 
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());		
