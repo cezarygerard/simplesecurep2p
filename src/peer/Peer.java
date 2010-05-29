@@ -125,6 +125,17 @@ public class Peer implements Runnable {
 	}
 	
 	public void run() {
+		try {
+			this.kmf.init(myKeystore, "123456".toCharArray());
+			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+			this.ssf = sc.getServerSocketFactory();
+			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
+			ss.setWantClientAuth(true);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+			
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
@@ -150,15 +161,8 @@ public class Peer implements Runnable {
 			Certificate [] chain =  {cert};
 			this.myKeystore.setKeyEntry("peerPrivKey", keyPair.getPrivate(), "123456".toCharArray(),chain);
 			X509Certificate c = (X509Certificate) myKeystore.getCertificate("peerPrivKey");
-
-			this.kmf.init(myKeystore, "123456".toCharArray());
-			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-			this.ssf = sc.getServerSocketFactory();
-			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
-			ss.setWantClientAuth(true);
 			hasValidCert = (c.getNotAfter().getTime() > System.currentTimeMillis() + 24 * 3600 * 1000);
 		}
-		
 		catch (Exception e)
 		{
 			e.printStackTrace();

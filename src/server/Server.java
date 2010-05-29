@@ -51,7 +51,6 @@ public class Server {
 	public enum STATE {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
 	}
-
 	public Server(String keystoreLoc,  char[] kestorePass, int listeningPort)
 	{
 		try {
@@ -140,7 +139,6 @@ public class Server {
 		else
 			return false;			
 	}	
-
 
 	/**
 	 * Generowanie certyfikatu x509
