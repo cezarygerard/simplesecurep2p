@@ -42,7 +42,7 @@ public abstract class Connection implements Runnable {
 	/**
 	 * timer do mierzenia timeoutow
 	 */
-	protected Timer timer;
+	//protected Timer timer;
 	protected TimerTask timeoutTask;
 	
 	/**
@@ -61,7 +61,7 @@ public abstract class Connection implements Runnable {
 	 * konstryktoe
 	 */
 	protected Connection() {
-		timer = new Timer();
+	//	timer = new Timer();
 		close = false;
 	}
 
@@ -69,7 +69,7 @@ public abstract class Connection implements Runnable {
 	 * metoda obslugujaca komendy protokolu
 	 */
 	protected abstract void HandleCommand(String command) throws ClassNotFoundException, IOException;
-
+/*
 	protected void setTimeout(int time)
 	{
 		timeoutTask = new TimerTask() {
@@ -82,7 +82,7 @@ public abstract class Connection implements Runnable {
 		};
 		timer.schedule(timeoutTask, time);
 	}
-	
+*/	
 	/**
 	 * wyslanie komendy
 	 */
