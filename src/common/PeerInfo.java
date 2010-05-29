@@ -61,7 +61,11 @@ public class PeerInfo implements Serializable, Comparable<PeerInfo> {
 		if (arg0 ==null)
 			throw new NullPointerException() ;
 
-			return addrMd.compareToIgnoreCase(((PeerInfo)arg0).addrMd);
-
+		return addrMd.compareTo(((PeerInfo)arg0).addrMd);
 	}	
+	
+	public boolean equals(PeerInfo arg0)
+	{
+		return this.addrMd.equals(arg0.addrMd);	
+	}
 }

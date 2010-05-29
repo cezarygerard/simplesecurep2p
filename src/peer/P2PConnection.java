@@ -109,7 +109,6 @@ public class P2PConnection extends Connection {
 			if(command.equals(P2PProtocol.MYFILEINFO))
 			{			
 				peer.someoneFiles.add((FileInfo) objInput.readObject());
-
 			}
 
 		} catch (ClassNotFoundException e) {
@@ -119,13 +118,11 @@ public class P2PConnection extends Connection {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	public void sendFileInfo(FileInfo fi) {
-		System.out.println("dzialaj kurwo!");
 		send(P2PProtocol.MYFILEINFO);
-		send(fi);		
+		send(fi);
+		terminateConnectionGently();
 	}
-
 }
