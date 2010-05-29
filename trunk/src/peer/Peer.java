@@ -119,7 +119,7 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		//	(new Thread(p)).start();
 		while(true)
 		{
@@ -146,7 +146,7 @@ public class Peer implements Runnable {
 		}
 
 		sendOutMyFilesInfo();
-		
+
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
@@ -196,16 +196,20 @@ public class Peer implements Runnable {
 			path = "./SharedFiles";
 
 		File dir = new File(path);
-		File[] files = dir.listFiles();
-		for (int i = 0; i < files.length; i++) {
-			try{
 
-				System.out.println(files[i].getName() + " " + files[i].getAbsolutePath());
-				sharedFiles.add(new FileInfo(files[i]));
-			}catch (Exception e) {
-				e.printStackTrace();
-			}						
-		}		
+		File[] files = dir.listFiles();
+		if(files !=null)
+		{
+			for (int i = 0; i < files.length; i++) {
+				try{
+
+					System.out.println(files[i].getName() + " " + files[i].getAbsolutePath());
+					sharedFiles.add(new FileInfo(files[i]));
+				}catch (Exception e) {
+					e.printStackTrace();
+				}						
+			}
+		}
 	}
 
 	void sendOutMyFilesInfo(){
@@ -213,11 +217,11 @@ public class Peer implements Runnable {
 		for (Iterator<FileInfo> iterator = sharedFiles.iterator(); iterator.hasNext();) {
 			{
 				final FileInfo fi = iterator.next();
-				
+
 				//final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
 				String lowerKey = this.peersInfo.lowerKey(fi.nameMD);
 				PeerInfo pi;// = new PeerInfo(null, 0);
-								
+
 				if(lowerKey == null)
 				{
 					this.someoneFiles.add(fi);
@@ -227,7 +231,7 @@ public class Peer implements Runnable {
 				{
 					pi = this.peersInfo.get(lowerKey);
 					System.out.println(pi.addrMd + " moj: " + this.myInfo.addrMd);
-					
+
 					if(pi == null)
 					{
 						this.someoneFiles.add(fi);
@@ -237,7 +241,7 @@ public class Peer implements Runnable {
 					{
 						System.out.println(pi.equals(this.myInfo));
 						System.out.println(pi.addrMd.equals(this.myInfo.addrMd));
-						
+
 						if(pi.equals(this.myInfo))
 						{
 							this.someoneFiles.add(fi);

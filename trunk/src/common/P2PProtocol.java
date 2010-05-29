@@ -5,8 +5,10 @@ package common;
  *
  * Protokol komunikacji pomiedzy peerami
  */
-public class P2PProtocol {
+public class P2PProtocol extends ProtocolBase {
 
 	//Peer-client side
 	public static final String MYFILEINFO = "myFileInfo";
+	
+	
 }

@@ -17,6 +17,7 @@ import javax.net.ssl.SSLSocket;
 import common.Connection;
 import common.FileInfo;
 import common.P2PProtocol;
+import common.P2SProtocol;
 import common.PeerInfo;
 
 
@@ -42,6 +43,7 @@ public class P2PConnection extends Connection {
 	public P2PConnection(Peer thisPeer,InetAddress addr, int port)
 	{
 		super();
+		peer =thisPeer;
 		try {
 			socket = (SSLSocket) peer.sf.createSocket(addr, port);
 		} catch (IOException e) {
@@ -84,8 +86,8 @@ public class P2PConnection extends Connection {
 		while (!close)
 		{
 			try {
-				System.out.println("[P2PConnection.run] waiting for msg");
 				String command = input.readLine();
+				System.out.println("[P2PConnection.run] command: " + command);
 				HandleCommand(command);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -106,23 +108,26 @@ public class P2PConnection extends Connection {
 	protected void HandleCommand(String command)
 	{
 		try {
-			if(command.equals(P2PProtocol.MYFILEINFO))
+			if(command.equals(P2PProtocol.EXIT))
+			{
+					terminateConnectionGently();			
+			}
+			else if(command.equals(P2PProtocol.MYFILEINFO))
 			{			
 				peer.someoneFiles.add((FileInfo) objInput.readObject());
 			}
 
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	
 		}
 	}
 
 	public void sendFileInfo(FileInfo fi) {
+		
 		send(P2PProtocol.MYFILEINFO);
 		send(fi);
-		terminateConnectionGently();
+		//terminateConnectionGently();
 	}
 }

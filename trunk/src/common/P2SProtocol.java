@@ -6,7 +6,7 @@ package common;
  * @TODO wydzielic klase bazowa z protokolem P2P 
  * Protokol komunikacji peera z serwerem
  */
-public class P2SProtocol {
+public class P2SProtocol extends ProtocolBase {
 	
 	//Peer
 	public static final String LOGIN = "login";
@@ -38,16 +38,4 @@ public class P2SProtocol {
 	//Server
 	public static final String PEERSINFO = "peersinfo";
 	
-	//Peer or Server
-	public static final String FAILURE = "failure";
-	
-	//Peer or Server
-	public static final String OK = "ok";
-	
-	
-	//Peer or Server
-	public static final String TIMEOUT = "timeout";
-	
-	//Peer or Server
-	public static final String EXIT = "exit";
 }
