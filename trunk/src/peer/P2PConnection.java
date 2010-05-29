@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.TreeSet;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
@@ -17,7 +16,6 @@ import javax.net.ssl.SSLSocket;
 import common.Connection;
 import common.FileInfo;
 import common.P2PProtocol;
-import common.P2SProtocol;
 import common.PeerInfo;
 
 
@@ -32,6 +30,7 @@ public class P2PConnection extends Connection {
 	public P2PConnection(Socket accept, Peer thisPeer) 
 	{
 		super();
+		System.out.println("[P2PConnection]");
 		this.socket = (SSLSocket) accept;
 		
 		//	System.out.println(socket.getRemoteSocketAddress());
@@ -102,7 +101,6 @@ public class P2PConnection extends Connection {
 				}
 			}
 		}
-
 	}
 
 	protected void HandleCommand(String command)
@@ -115,6 +113,12 @@ public class P2PConnection extends Connection {
 			else if(command.equals(P2PProtocol.MYFILEINFO))
 			{			
 				peer.someoneFiles.add((FileInfo) objInput.readObject());
+				terminateConnectionGently();
+			}
+			else if(command.equals(P2PProtocol.MYFILEINFOBUCKUP))
+			{
+				peer.backUpFiles.add((FileInfo) objInput.readObject());
+				terminateConnectionGently();
 			}
 
 		} catch (Exception e) {
@@ -129,5 +133,11 @@ public class P2PConnection extends Connection {
 		send(P2PProtocol.MYFILEINFO);
 		send(fi);
 		//terminateConnectionGently();
+	}
+
+	public void sendBackUpFileInfo(FileInfo fi) {
+		// TODO Auto-generated method stub
+		send(P2PProtocol.MYFILEINFOBUCKUP);
+		send(fi);	
 	}
 }
