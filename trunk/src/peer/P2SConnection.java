@@ -97,7 +97,7 @@ public class P2SConnection extends Connection implements Runnable {
 			{
 				System.out.println("[P2SConnection.HandleCommand] PEERSINFO");
 				TreeSet<PeerInfo> pi = (TreeSet<PeerInfo>) objInput.readObject();
-				peer.peersInfo = pi;
+				this.peer.peersInfo = pi;
 				System.out.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: " + pi);
 				if(!peer.hasValidCert)
 				{

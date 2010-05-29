@@ -33,5 +33,5 @@ public class FileInfo implements Serializable{
 	String type;
 	long size;
 	transient File file;
-
+ ;
 }

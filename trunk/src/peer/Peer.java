@@ -130,7 +130,8 @@ public class Peer implements Runnable {
 			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 			this.ssf = sc.getServerSocketFactory();
 			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
-			ss.setWantClientAuth(true);
+			//ss.setWantClientAuth(true);
+			ss.setNeedClientAuth(true);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
