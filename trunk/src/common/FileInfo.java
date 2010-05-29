@@ -53,7 +53,7 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 		if (arg0 ==null)
 			throw new NullPointerException() ;
 
-			return nameMD.compareToIgnoreCase(((FileInfo)arg0).nameMD);
+			return nameMD.compareTo(((FileInfo)arg0).nameMD);
 	}	
 
 }

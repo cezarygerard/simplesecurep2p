@@ -32,6 +32,7 @@ public class P2PConnection extends Connection {
 	{
 		super();
 		this.socket = (SSLSocket) accept;
+		
 		//	System.out.println(socket.getRemoteSocketAddress());
 		//	System.out.println(socket.getLocalSocketAddress());
 		peer =thisPeer;
