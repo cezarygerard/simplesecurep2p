@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -94,7 +95,7 @@ public abstract class Connection implements Runnable {
 	/**
 	 * wyslanie objektu
 	 */
-	protected void send(Object obj) {
+	protected void send(Serializable obj) {
 	    if (objOutput != null)
 			try {
 				objOutput.writeObject(obj);

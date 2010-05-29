@@ -111,7 +111,7 @@ public class Peer implements Runnable {
 
 		Peer p = new Peer(9795);
 		p.getFiles(null);
-		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.46.124"), 9995);
+		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.1.3"), 9995);
 		p.peerLogin = new PeerLoginInfo("czarek", "12345", false);
 		try {
 			p2s.Connect();
@@ -119,9 +119,8 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		//	(new Thread(p)).start();
-
-
 		while(true)
 		{
 			try {
@@ -215,21 +214,47 @@ public class Peer implements Runnable {
 			{
 				final FileInfo fi = iterator.next();
 				
-				final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
-				
-				System.out.println(pi.addrMd + " moj: " + this.myInfo.addrMd);
-				if(pi.equals(this.myInfo))
+				//final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
+				String lowerKey = this.peersInfo.lowerKey(fi.nameMD);
+				PeerInfo pi;// = new PeerInfo(null, 0);
+								
+				if(lowerKey == null)
 				{
 					this.someoneFiles.add(fi);
 					continue;
 				}
-				
-				final Peer p = this;
-				new Thread(new Runnable() {
-					public void run() {
-						new P2PConnection(p, pi.addr, pi.listeningPort).sendFileInfo(fi);			
+				else
+				{
+					pi = this.peersInfo.get(lowerKey);
+					System.out.println(pi.addrMd + " moj: " + this.myInfo.addrMd);
+					
+					if(pi == null)
+					{
+						this.someoneFiles.add(fi);
+						continue;
 					}
-				}).start(); 				
+					else
+					{
+						System.out.println(pi.equals(this.myInfo));
+						System.out.println(pi.addrMd.equals(this.myInfo.addrMd));
+						
+						if(pi.equals(this.myInfo))
+						{
+							this.someoneFiles.add(fi);
+							continue;
+						}
+						else
+						{
+							final PeerInfo finalPi = pi;
+							final Peer p = this;
+							new Thread(new Runnable() {
+								public void run() {
+									new P2PConnection(p, finalPi.addr, finalPi.listeningPort).sendFileInfo(fi);			
+								}
+							}).start(); 
+						}
+					}
+				}				
 			}
 		}		
 	}
