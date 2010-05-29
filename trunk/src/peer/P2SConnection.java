@@ -51,7 +51,7 @@ public class P2SConnection extends Connection implements Runnable {
 		//s.startHandshake();
 		
 		//to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania - wiemy jakie gniazdko dostaniemy od systemu
-		peer.myInfo = new PeerInfo(socket.getInetAddress(), peer.listeningPort);
+		peer.myInfo = new PeerInfo(socket.getLocalAddress(), peer.listeningPort);
 
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);	
