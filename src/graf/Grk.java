@@ -15,12 +15,17 @@ package graf;
 import java.awt.ComponentOrientation;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
 /**
  *
  * @author Klaudia
  */
-public class Grk extends javax.swing.JFrame {
+ public class Grk extends javax.swing.JFrame {
+
+    /** Creates new form Grk */
+    public Grk() {
+        initComponents();
+    }
+
 
     
 
