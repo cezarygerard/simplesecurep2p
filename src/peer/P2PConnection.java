@@ -123,6 +123,7 @@ public class P2PConnection extends Connection {
 	}
 
 	public void sendFileInfo(FileInfo fi) {
+		System.out.println("dzialaj kurwo!");
 		send(P2PProtocol.MYFILEINFO);
 		send(fi);		
 	}

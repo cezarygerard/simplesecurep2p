@@ -217,6 +217,7 @@ public class Peer implements Runnable {
 				
 				final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
 				
+				System.out.println(pi.addrMd + " moj: " + this.myInfo.addrMd);
 				if(pi.equals(this.myInfo))
 				{
 					this.someoneFiles.add(fi);
@@ -228,7 +229,7 @@ public class Peer implements Runnable {
 					public void run() {
 						new P2PConnection(p, pi.addr, pi.listeningPort).sendFileInfo(fi);			
 					}
-				}); 				
+				}).start(); 				
 			}
 		}		
 	}
