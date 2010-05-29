@@ -31,8 +31,8 @@ public class S2PConnection extends Connection implements Runnable{
 	S2PConnection(Socket accept, Server serv) {
 		super();
 		this.socket = (SSLSocket) accept;
-		System.out.println(socket.getRemoteSocketAddress());
-		System.out.println(socket.getLocalSocketAddress());
+	//	System.out.println(socket.getRemoteSocketAddress());
+	//	System.out.println(socket.getLocalSocketAddress());
 		server =serv;
 		try {
 			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -108,7 +108,7 @@ public class S2PConnection extends Connection implements Runnable{
 				System.out.println("[S2PConnection.HandleCommand] MYINFO");
 				PeerInfo pi = (PeerInfo) objInput.readObject();
 				System.out.println("[S2PConnection.HandleCommand] PeerInfo: " + pi);
-				server.peersInfo.add(pi);				
+				server.peersInfo.put(pi.addrMd, pi);			
 			}
 			else if (command.equals(P2SProtocol.GETPEERSINFO))
 			{

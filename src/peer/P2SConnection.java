@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.net.ssl.HandshakeCompletedEvent;
@@ -31,6 +32,7 @@ public class P2SConnection extends Connection implements Runnable {
 
 	P2SConnection(Peer p,InetAddress addr, int port)
 	{
+		super();
 		this.addr = addr;
 		this.port = port;
 		this.peer = p;
@@ -96,9 +98,10 @@ public class P2SConnection extends Connection implements Runnable {
 			else if(command.equals(P2SProtocol.PEERSINFO))
 			{
 				System.out.println("[P2SConnection.HandleCommand] PEERSINFO");
-				TreeSet<PeerInfo> pi = (TreeSet<PeerInfo>) objInput.readObject();
+				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput.readObject();
 				this.peer.peersInfo = pi;
 				System.out.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: " + pi);
+				
 				if(!peer.hasValidCert)
 				{
 					send(P2SProtocol.GETCERT);
@@ -107,16 +110,20 @@ public class P2SConnection extends Connection implements Runnable {
 				else
 				{
 					terminateConnectionGently();
+					peer.StatrListening();
 				}
 			}
 			else if  (command.equals(P2SProtocol.CERT))
 			{
+				
 				peer.storeX509cert((X509Certificate)objInput.readObject(), (KeyPair)objInput.readObject());			
 				terminateConnectionGently();
+				peer.StatrListening();
 			}
 			else if  (command.equals(P2SProtocol.EXIT))
 			{
 				terminateConnectionGently();
+				peer.StatrListening();
 			}
 		}
 		catch(Exception e){
