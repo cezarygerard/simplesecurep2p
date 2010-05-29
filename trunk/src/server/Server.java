@@ -18,6 +18,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -40,7 +41,7 @@ import common.PeerLoginInfo;
 public class Server {
 
 	private TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); ; 
-	TreeSet<PeerInfo > peersInfo = new TreeSet<PeerInfo>();
+	TreeMap<String, PeerInfo> peersInfo = new TreeMap<String, PeerInfo>();
 	private FileInputStream is ; 
 	private KeyStore keystore;
 	private KeyManagerFactory kmf;

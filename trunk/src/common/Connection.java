@@ -67,10 +67,7 @@ public abstract class Connection implements Runnable {
 	/**
 	 * metoda obslugujaca komendy protokolu
 	 */
-	protected void HandleCommand(String command) throws ClassNotFoundException, IOException {
-		// TODO Auto-generated method stub
-		
-	}
+	protected abstract void HandleCommand(String command) throws ClassNotFoundException, IOException;
 
 	protected void setTimeout(int time)
 	{
