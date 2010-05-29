@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * @author czarek
+g * @author czarek
  *	Klasa reprezentuje Informacje potrzebne do logowania.
  *	Wykorzystywana zarowno w klasie Server jak i Peer
  */
