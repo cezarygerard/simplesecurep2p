@@ -129,6 +129,12 @@ public class S2PConnection extends Connection implements Runnable{
 			{
 				terminateConnectionGently();
 			}
+			else if (command.equals(P2SProtocol.PEER_DEATH_NOTIFICATION))
+			{
+				PeerInfo pi = (PeerInfo) objInput.readObject();
+				server.peersInfo.remove(pi.addrMd);
+				terminateConnectionGently();
+			}
 			
 		}catch(Exception e){
 			e.printStackTrace();

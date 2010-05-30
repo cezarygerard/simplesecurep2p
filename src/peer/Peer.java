@@ -34,6 +34,7 @@ import javax.security.auth.x500.X500Principal;
 import common.FileInfo;
 import common.PeerInfo;
 import common.PeerLoginInfo;
+import common.ServerInfo;
 import common.utils;
 
 
@@ -62,6 +63,7 @@ public class Peer implements Runnable {
 	int listeningPort;
 	PeerLoginInfo peerLogin;
 	PeerInfo myInfo;
+	ServerInfo serverInfo;
 	X500Principal certInfo;
 	Timer neighbourRecognitionTimer = new Timer("neighbourRecognitionThread");
 
@@ -149,7 +151,8 @@ public class Peer implements Runnable {
 	public void run() {
 		try {
 			this.kmf.init(myKeystore, "123456".toCharArray());
-			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+		//	this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+			this.sc.init(kmf.getKeyManagers(), null, null);
 			this.ssf = sc.getServerSocketFactory();
 			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
 			//ss.setWantClientAuth(true);
@@ -205,7 +208,7 @@ public class Peer implements Runnable {
 						(new P2PConnection(p, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
-						p.peerDeathNotify(neighbour);
+						p.peerDeathHandler(neighbour);
 					}
 				}
 			};		
@@ -221,10 +224,20 @@ public class Peer implements Runnable {
 		};
 	}
 
-	protected void peerDeathNotify(PeerInfo neighbour) {
+	protected void peerDeathHandler(final PeerInfo neighbour) {
 		System.out.println("[Peer.peerDeathNotify] " + neighbour);
 		this.peersInfo.remove(neighbour.addrMd);
 		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
+		final Peer p = this;
+		Thread t = new Thread(new Runnable() {
+		
+			@Override
+			public void run() {
+				P2SConnection p2s = new P2SConnection(p,p.serverInfo.addr, p.serverInfo.listeningPort);
+				p2s.peerDeathNotification(neighbour);
+			}
+		}, " peerDeathHandler " + neighbour);
+		t.start();
 	}
 
 	void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {
