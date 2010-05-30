@@ -256,7 +256,6 @@ public class Peer implements Runnable {
 			path = "./SharedFiles";
 
 		File dir = new File(path);
-
 		File[] files = dir.listFiles();
 		if(files !=null)
 		{
