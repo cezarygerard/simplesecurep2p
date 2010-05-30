@@ -45,9 +45,9 @@ import common.utils;
 public class Peer implements Runnable {
 
 	SortedMap <String, PeerInfo > peersInfo = Collections.synchronizedSortedMap(new TreeMap<String, PeerInfo>());
-//	SortedSet<List<FileInfo>> sharedFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
-//	SortedSet<List<FileInfo>> someoneFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
-//	SortedSet<List<FileInfo>> backUpFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
+	//	SortedSet<List<FileInfo>> sharedFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
+	//	SortedSet<List<FileInfo>> someoneFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
+	//	SortedSet<List<FileInfo>> backUpFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
 	SortedSet<FileInfo> sharedFiles = Collections.synchronizedSortedSet(new TreeSet< FileInfo > ());
 	SortedSet<FileInfo> someoneFiles = Collections.synchronizedSortedSet(new TreeSet< FileInfo > ());
 	SortedSet<FileInfo> backUpFiles = Collections.synchronizedSortedSet(new TreeSet< FileInfo > ());
@@ -63,8 +63,8 @@ public class Peer implements Runnable {
 	PeerLoginInfo peerLogin;
 	PeerInfo myInfo;
 	X500Principal certInfo;
-	Timer neighbourRecognitionTimer;
-	
+	Timer neighbourRecognitionTimer = new Timer("neighbourRecognitionThread");
+
 	///elementy potrzebne do nasluchowania
 	private SSLServerSocketFactory ssf;
 	private SSLServerSocket ss;
@@ -190,24 +190,35 @@ public class Peer implements Runnable {
 		{
 			neighbourKey = (String) sm.lastKey();
 		}
-		
+
 		if(neighbourKey == null)
 			neighbourKey = this.peersInfo.lastKey();
-		
+
 		neighbour = this.peersInfo.get(neighbourKey);
-		
-		return new TimerTask() {
-			
-			@Override
-			public void run() {				
-				try {
-					(new P2PConnection(p, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					p.peerDeathNotify(neighbour);
+		if(!neighbour.equals(this.myInfo))
+		{
+			return new TimerTask() {
+
+				@Override
+				public void run() {				
+					try {
+						(new P2PConnection(p, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						p.peerDeathNotify(neighbour);
+					}
 				}
-			}
-		};		
+			};		
+		}
+		else
+			return new TimerTask() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					
+				}
+			};
 	}
 
 	protected void peerDeathNotify(PeerInfo neighbour) {
@@ -258,7 +269,7 @@ public class Peer implements Runnable {
 			}
 		}
 	}
- 
+
 	/**
 	 * @Todo optymalizacji poprzez grupowania plikow do poszczegolnych peerow i przeslanie tego jednym polaczeniem
 	 */
@@ -273,31 +284,31 @@ public class Peer implements Runnable {
 			final PeerInfo buckupOwner;
 			String infoOwnerKey = null;// = this.peersInfo.lowerKey(fi.nameMD);
 			String buckupOwnerKey = null;// = 
-			
+
 			SortedMap<String, PeerInfo > sm = this.peersInfo.headMap(fi.nameMD);
 			if(sm != null && sm.size() > 0)
 			{
 				infoOwnerKey = (String) sm.lastKey();
 			}
-			
+
 			if(infoOwnerKey == null)
 				infoOwnerKey = this.peersInfo.lastKey();
-			
+
 			SortedMap<String, PeerInfo > sm1 = this.peersInfo.headMap(infoOwnerKey);
 			if(sm1 != null && sm1.size() > 0)
 			{
 				buckupOwnerKey = (String) sm1.lastKey();
 			}
-			
+
 			if(buckupOwnerKey == null)
 				buckupOwnerKey = this.peersInfo.lastKey();
 
-		
+
 			infoOwner = this.peersInfo.get(infoOwnerKey);
 			buckupOwner = this.peersInfo.get(buckupOwnerKey);
 
 			final Peer p = this;
-			
+
 			System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwnerKey: " + infoOwnerKey + " buckupOwnerKey "  + buckupOwnerKey + " myinfo: " + this.myInfo.addrMd);
 			System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwner.equals(this.myInfo): " + infoOwner.equals(this.myInfo) + " (buckupOwner.equals(this.myInfo)) "  + (buckupOwner.equals(this.myInfo)));
 
