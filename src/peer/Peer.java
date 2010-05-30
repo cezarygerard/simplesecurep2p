@@ -288,8 +288,8 @@ public class Peer implements Runnable {
 				final FileInfo fi = iterator.next();
 
 				//final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
-				final PeerInfo infoOwner;// = new PeerInfo(null, 0);
-				final PeerInfo buckupOwner;
+				PeerInfo infoOwner;// = new PeerInfo(null, 0);
+				PeerInfo buckupOwner;
 				String infoOwnerKey = null;// = this.peersInfo.lowerKey(fi.nameMD);
 				String buckupOwnerKey = null;// = 
 
@@ -320,49 +320,48 @@ public class Peer implements Runnable {
 				System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwnerKey: " + infoOwnerKey + " buckupOwnerKey "  + buckupOwnerKey + " myinfo: " + this.myInfo.addrMd);
 				System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwner.equals(this.myInfo): " + infoOwner.equals(this.myInfo) + " (buckupOwner.equals(this.myInfo)) "  + (buckupOwner.equals(this.myInfo)));
 
-				if(!(infoOwner.equals(this.myInfo)))
+				if((infoOwner.equals(this.myInfo)))
 				{
-					Thread t =new Thread(new Runnable() {
-						public void run() {
-							try {
-								new P2PConnection(p, infoOwner.addr, infoOwner.listeningPort).sendFileInfo(fi);
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}			
-						}
-					}, "sendFileInfo thread " + infoOwner);
-					t.start();
-				}
-				else
-				{
+					infoOwner = null;
 					if(!this.someoneFiles.add(fi))
 					{//wpis juz byl!
 						this.someoneFiles.tailSet(fi).first().ownersInfo.add(this.myInfo);
 					}
 				}
 
-				if(!(buckupOwner.equals(this.myInfo)))
+				if((buckupOwner.equals(this.myInfo)))
 				{
-					Thread t1 =new Thread(new Runnable() {
-						public void run() {
-							try {
-								new P2PConnection(p, buckupOwner.addr, buckupOwner.listeningPort).sendBackUpFileInfo(fi);
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}			
-						}
-					} + " sendBackUpFileInfo thread " + buckupOwner);
-					t1.start();
-				}
-				else
-				{
+					buckupOwner = null;
 					if(!this.backUpFiles.add(fi))
 					{//wpis juz byl!
 						this.backUpFiles.tailSet(fi).first().ownersInfo.add(this.myInfo);
 					}
 				}
+				final PeerInfo finalInfoOwner = infoOwner;
+				final PeerInfo finalbuckupOwner = buckupOwner; 
+				Thread t = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						if(finalInfoOwner != null)
+							try {
+								new P2PConnection(p, finalInfoOwner.addr, finalInfoOwner.listeningPort).sendFileInfo(fi);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}			
+						if(finalbuckupOwner != null)
+							try {
+								new P2PConnection(p, finalbuckupOwner.addr, finalbuckupOwner.listeningPort).sendBackUpFileInfo(fi);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						
+					}
+				}, " send file infos  finalInfoOwner: " + finalInfoOwner +  " finalbuckupOwner: " + finalbuckupOwner);
+			
+				t.start();
 			}
 		}		
 	}
