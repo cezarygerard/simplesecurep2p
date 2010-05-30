@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -99,7 +101,7 @@ public class P2SConnection extends Connection implements Runnable {
 			{
 				System.out.println("[P2SConnection.HandleCommand] PEERSINFO");
 				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput.readObject();
-				this.peer.peersInfo = pi;
+				this.peer.peersInfo = Collections.synchronizedSortedMap(pi);
 				System.out.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: " + pi + "  " + pi.size());
 				
 				if(!peer.hasValidCert)

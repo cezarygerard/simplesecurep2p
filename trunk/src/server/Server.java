@@ -18,6 +18,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
 import java.util.Collections;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -41,8 +43,8 @@ import common.PeerLoginInfo;
 
 public class Server {
 
-	private TreeSet<PeerLoginInfo > loginInfo = (TreeSet<PeerLoginInfo>) Collections.synchronizedSortedSet(new TreeSet<PeerLoginInfo>()) ; 
-	TreeMap<String, PeerInfo> peersInfo = (TreeMap<String, PeerInfo>) Collections.synchronizedSortedMap(new TreeMap<String, PeerInfo>());
+	SortedSet<PeerLoginInfo > loginInfo = Collections.synchronizedSortedSet(new TreeSet<PeerLoginInfo>()) ; 
+	SortedMap<String, PeerInfo> peersInfo = Collections.synchronizedSortedMap(new TreeMap<String, PeerInfo>());
 
 	private FileInputStream is ; 
 	private KeyStore keystore;
@@ -136,7 +138,7 @@ public class Server {
 	 */
 	boolean verifyPeer(PeerLoginInfo pli)
 	{
-		PeerLoginInfo pliAtServer= (loginInfo.subSet(pli, true, pli, true)).first();
+		PeerLoginInfo pliAtServer= loginInfo.tailSet(pli).first();
 		if (pliAtServer != null && (pliAtServer.getPasswdHash()).equals(pli.getPasswdHash()))
 			return true;
 		else

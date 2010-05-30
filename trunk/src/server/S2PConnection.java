@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
+import java.util.TreeMap;
 
 import javax.net.ssl.SSLSocket;
 import javax.security.auth.x500.X500Principal;
@@ -113,7 +114,7 @@ public class S2PConnection extends Connection implements Runnable{
 			else if (command.equals(P2SProtocol.GETPEERSINFO))
 			{
 				send(P2SProtocol.PEERSINFO);
-				send(server.peersInfo);
+				send(new TreeMap<String, PeerInfo>(server.peersInfo));
 			}
 			else if (command.equals(P2SProtocol.GETCERT))
 			{
