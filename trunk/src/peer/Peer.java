@@ -195,7 +195,7 @@ public class Peer implements Runnable {
 			neighbourKey = this.peersInfo.lastKey();
 
 		neighbour = this.peersInfo.get(neighbourKey);
-		if(!neighbour.equals(this.myInfo))
+		if(!(neighbour.equals(this.myInfo)))
 		{
 			return new TimerTask() {
 
@@ -212,17 +212,21 @@ public class Peer implements Runnable {
 		}
 		else
 			return new TimerTask() {
-				
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					
-				}
-			};
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+
+			}
+		};
 	}
 
 	protected void peerDeathNotify(PeerInfo neighbour) {
 		System.out.println("[Peer.peerDeathNotify] " + neighbour);
+		neighbourRecognitionTimer.cancel();
+		this.peersInfo.remove(neighbour.addrMd);
+		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
+		
 	}
 
 	void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {
@@ -244,7 +248,7 @@ public class Peer implements Runnable {
 	void StatrListening() {
 		if (this.hasValidCert)
 		{
-			new Thread(this).start();
+			new Thread(this, "Listening Thread").start();
 		}		
 	}
 
@@ -262,7 +266,9 @@ public class Peer implements Runnable {
 				try{
 
 					System.out.println(files[i].getName() + " " + files[i].getAbsolutePath());
-					sharedFiles.add(new FileInfo(files[i]));
+					FileInfo fi = new FileInfo(files[i]);
+					fi.ownersInfo.add(this.myInfo);
+					sharedFiles.add(fi);
 				}catch (Exception e) {
 					e.printStackTrace();
 				}						
@@ -271,91 +277,94 @@ public class Peer implements Runnable {
 	}
 
 	/**
+	 * @return 
 	 * @Todo optymalizacji poprzez grupowania plikow do poszczegolnych peerow i przeslanie tego jednym polaczeniem
 	 */
-	void sendOutMyFilesInfo(){
+	synchronized  void sendOutMyFilesInfo(){
 
 		for (Iterator<FileInfo> iterator = sharedFiles.iterator(); iterator.hasNext();) 
 		{
-			final FileInfo fi = iterator.next();
+			synchronized (this) {
+				final FileInfo fi = iterator.next();
 
-			//final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
-			final PeerInfo infoOwner;// = new PeerInfo(null, 0);
-			final PeerInfo buckupOwner;
-			String infoOwnerKey = null;// = this.peersInfo.lowerKey(fi.nameMD);
-			String buckupOwnerKey = null;// = 
+				//final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
+				final PeerInfo infoOwner;// = new PeerInfo(null, 0);
+				final PeerInfo buckupOwner;
+				String infoOwnerKey = null;// = this.peersInfo.lowerKey(fi.nameMD);
+				String buckupOwnerKey = null;// = 
 
-			SortedMap<String, PeerInfo > sm = this.peersInfo.headMap(fi.nameMD);
-			if(sm != null && sm.size() > 0)
-			{
-				infoOwnerKey = (String) sm.lastKey();
-			}
+				SortedMap<String, PeerInfo > sm = this.peersInfo.headMap(fi.nameMD);
+				if(sm != null && sm.size() > 0)
+				{
+					infoOwnerKey = (String) sm.lastKey();
+				}
 
-			if(infoOwnerKey == null)
-				infoOwnerKey = this.peersInfo.lastKey();
+				if(infoOwnerKey == null)
+					infoOwnerKey = this.peersInfo.lastKey();
 
-			SortedMap<String, PeerInfo > sm1 = this.peersInfo.headMap(infoOwnerKey);
-			if(sm1 != null && sm1.size() > 0)
-			{
-				buckupOwnerKey = (String) sm1.lastKey();
-			}
+				SortedMap<String, PeerInfo > sm1 = this.peersInfo.headMap(infoOwnerKey);
+				if(sm1 != null && sm1.size() > 0)
+				{
+					buckupOwnerKey = (String) sm1.lastKey();
+				}
 
-			if(buckupOwnerKey == null)
-				buckupOwnerKey = this.peersInfo.lastKey();
+				if(buckupOwnerKey == null)
+					buckupOwnerKey = this.peersInfo.lastKey();
 
 
-			infoOwner = this.peersInfo.get(infoOwnerKey);
-			buckupOwner = this.peersInfo.get(buckupOwnerKey);
+				infoOwner = this.peersInfo.get(infoOwnerKey);
+				buckupOwner = this.peersInfo.get(buckupOwnerKey);
 
-			final Peer p = this;
+				final Peer p = this;
 
-			System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwnerKey: " + infoOwnerKey + " buckupOwnerKey "  + buckupOwnerKey + " myinfo: " + this.myInfo.addrMd);
-			System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwner.equals(this.myInfo): " + infoOwner.equals(this.myInfo) + " (buckupOwner.equals(this.myInfo)) "  + (buckupOwner.equals(this.myInfo)));
+				System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwnerKey: " + infoOwnerKey + " buckupOwnerKey "  + buckupOwnerKey + " myinfo: " + this.myInfo.addrMd);
+				System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwner.equals(this.myInfo): " + infoOwner.equals(this.myInfo) + " (buckupOwner.equals(this.myInfo)) "  + (buckupOwner.equals(this.myInfo)));
 
-			if(!(infoOwner.equals(this.myInfo)))
-			{
-				Thread t =new Thread(new Runnable() {
-					public void run() {
-						try {
-							new P2PConnection(p, infoOwner.addr, infoOwner.listeningPort).sendFileInfo(fi);
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}			
+				if(!(infoOwner.equals(this.myInfo)))
+				{
+					Thread t =new Thread(new Runnable() {
+						public void run() {
+							try {
+								new P2PConnection(p, infoOwner.addr, infoOwner.listeningPort).sendFileInfo(fi);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}			
+						}
+					}, "sendFileInfo thread " + infoOwner);
+					t.start();
+				}
+				else
+				{
+					if(!this.someoneFiles.add(fi))
+					{//wpis juz byl!
+						this.someoneFiles.tailSet(fi).first().ownersInfo.add(this.myInfo);
 					}
-				});
-				t.start();
-			}
-			else
-			{
-				if(!this.someoneFiles.add(fi))
-				{//wpis juz byl!
-					this.someoneFiles.tailSet(fi).first().ownersInfo.add(this.myInfo);
+				}
+
+				if(!(buckupOwner.equals(this.myInfo)))
+				{
+					Thread t1 =new Thread(new Runnable() {
+						public void run() {
+							try {
+								new P2PConnection(p, buckupOwner.addr, buckupOwner.listeningPort).sendBackUpFileInfo(fi);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}			
+						}
+					} + " sendBackUpFileInfo thread " + buckupOwner);
+					t1.start();
+				}
+				else
+				{
+					if(!this.backUpFiles.add(fi))
+					{//wpis juz byl!
+						this.backUpFiles.tailSet(fi).first().ownersInfo.add(this.myInfo);
+					}
 				}
 			}
-
-			if(!(buckupOwner.equals(this.myInfo)))
-			{
-				Thread t1 =new Thread(new Runnable() {
-					public void run() {
-						try {
-							new P2PConnection(p, buckupOwner.addr, buckupOwner.listeningPort).sendBackUpFileInfo(fi);
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}			
-					}
-				});
-				t1.start();
-			}
-			else
-			{
-				if(!this.backUpFiles.add(fi))
-				{//wpis juz byl!
-					this.backUpFiles.tailSet(fi).first().ownersInfo.add(this.myInfo);
-				}
-			}
-		}
-	}		
+		}		
+	}
 }
 
