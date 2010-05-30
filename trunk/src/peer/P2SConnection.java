@@ -98,8 +98,7 @@ public class P2SConnection extends Connection implements Runnable {
 				send(P2SProtocol.GETPEERSINFO);
 			} else if (command.equals(P2SProtocol.PEERSINFO)) {
 				System.out.println("[P2SConnection.HandleCommand] PEERSINFO");
-				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput
-						.readObject();
+				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput.readObject();
 				this.peer.peersInfo = Collections.synchronizedSortedMap(pi);
 				System.out
 						.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: "

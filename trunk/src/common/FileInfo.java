@@ -57,5 +57,10 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 
 			return nameMD.compareTo(((FileInfo)arg0).nameMD);
 	}	
+	
+	public boolean equals(FileInfo arg0)
+	{
+		return nameMD.equals(((FileInfo)arg0).nameMD);
+	}
 
 }
