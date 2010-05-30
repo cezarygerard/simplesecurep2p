@@ -20,6 +20,7 @@ import javax.net.ssl.SSLSocket;
 import common.Connection;
 import common.P2SProtocol;
 import common.PeerInfo;
+import common.ServerInfo;
 
 public class P2SConnection extends Connection implements Runnable {
 
@@ -29,7 +30,7 @@ public class P2SConnection extends Connection implements Runnable {
 	private STATE state;
 
 	private enum STATE {
-		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
+		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING, PEERDEATHNOTIFICATION
 	}
 
 	P2SConnection(Peer p, InetAddress addr, int port) {
@@ -37,6 +38,7 @@ public class P2SConnection extends Connection implements Runnable {
 		this.addr = addr;
 		this.port = port;
 		this.peer = p;
+		p.serverInfo = new ServerInfo(addr, port);
 	}
 
 	void Connect() throws Exception {
@@ -125,5 +127,14 @@ public class P2SConnection extends Connection implements Runnable {
 			e.printStackTrace();
 			terminateConnectionWithFailure();
 		}
+	}
+
+	public void peerDeathNotification(PeerInfo deadPeerInfo) {
+		state = STATE.PEERDEATHNOTIFICATION;
+		send(P2SProtocol.LOGIN);
+		send(peer.peerLogin);
+		send(P2SProtocol.PEER_DEATH_NOTIFICATION);
+		send(deadPeerInfo);
+		
 	}
 }

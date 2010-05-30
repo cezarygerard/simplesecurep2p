@@ -146,6 +146,7 @@ public class P2PConnection extends Connection {
 				{
 					peer.backUpFiles.addAll(files_info);
 				}
+				terminateConnectionGently();
 			}
 
 		} catch (Exception e) {

@@ -38,4 +38,7 @@ public class P2SProtocol extends ProtocolBase {
 	//Server
 	public static final String PEERSINFO = "peersinfo";
 	
+	//klient
+	public static final String PEER_DEATH_NOTIFICATION = "peerDeathNotification";
+	
 }
