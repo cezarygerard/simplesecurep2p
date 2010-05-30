@@ -152,7 +152,6 @@ public class Peer implements Runnable {
 		try {
 			this.kmf.init(myKeystore, "123456".toCharArray());
 			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-			this.sc.init(kmf.getKeyManagers(), null, null);
 			this.ssf = sc.getServerSocketFactory();
 			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
 			//ss.setWantClientAuth(true);
