@@ -45,7 +45,7 @@ public class P2SConnection extends Connection implements Runnable {
 		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
 		{
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {
-				System.out.println("handshakeCompleted " + arg0.toString() + arg0);						
+		//		System.out.println("handshakeCompleted " + arg0.toString() + arg0);						
 			}			
 		});
 		//s.startHandshake();
@@ -110,7 +110,7 @@ public class P2SConnection extends Connection implements Runnable {
 				else
 				{
 					terminateConnectionGently();
-					peer.StatrListening();
+						peer.StatrListening();
 				}
 			}
 			else if  (command.equals(P2SProtocol.CERT))

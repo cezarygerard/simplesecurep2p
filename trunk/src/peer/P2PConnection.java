@@ -52,7 +52,7 @@ public class P2PConnection extends Connection {
 		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
 		{
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {
-				System.out.println("handshakeCompleted " + arg0.toString() + arg0);						
+		//		System.out.println("handshakeCompleted " + arg0.toString() + arg0);						
 			}			
 		});
 
@@ -137,6 +137,7 @@ public class P2PConnection extends Connection {
 
 	public void sendBackUpFileInfo(FileInfo fi) {
 		// TODO Auto-generated method stub
+		
 		send(P2PProtocol.MYFILEINFOBUCKUP);
 		send(fi);	
 	}

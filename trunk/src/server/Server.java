@@ -17,6 +17,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
+import java.util.Collections;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -40,8 +41,9 @@ import common.PeerLoginInfo;
 
 public class Server {
 
-	private TreeSet<PeerLoginInfo > loginInfo = new TreeSet<PeerLoginInfo>(); ; 
-	TreeMap<String, PeerInfo> peersInfo = new TreeMap<String, PeerInfo>();
+	private TreeSet<PeerLoginInfo > loginInfo = (TreeSet<PeerLoginInfo>) Collections.synchronizedSortedSet(new TreeSet<PeerLoginInfo>()) ; 
+	TreeMap<String, PeerInfo> peersInfo = (TreeMap<String, PeerInfo>) Collections.synchronizedSortedMap(new TreeMap<String, PeerInfo>());
+
 	private FileInputStream is ; 
 	private KeyStore keystore;
 	private KeyManagerFactory kmf;
