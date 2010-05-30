@@ -32,46 +32,45 @@ public class P2SConnection extends Connection implements Runnable {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
 	}
 
-	P2SConnection(Peer p,InetAddress addr, int port)
-	{
+	P2SConnection(Peer p, InetAddress addr, int port) {
 		super();
 		this.addr = addr;
 		this.port = port;
 		this.peer = p;
 	}
 
-	void Connect() throws Exception 
-	{
+	void Connect() throws Exception {
 
 		socket = (SSLSocket) peer.sf.createSocket(addr, port);
-		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
-		{
+		socket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {
-		//		System.out.println("handshakeCompleted " + arg0.toString() + arg0);						
-			}			
+				// System.out.println("handshakeCompleted " + arg0.toString() +
+				// arg0);
+			}
 		});
-		//s.startHandshake();
-		
-		//to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania - wiemy jakie gniazdko dostaniemy od systemu
+		// s.startHandshake();
+
+		// to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania -
+		// wiemy jakie gniazdko dostaniemy od systemu
 		peer.myInfo = new PeerInfo(socket.getLocalAddress(), peer.listeningPort);
 
-		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		output = new PrintWriter(socket.getOutputStream(), true);	
+		input = new BufferedReader(new InputStreamReader(socket
+				.getInputStream()));
+		output = new PrintWriter(socket.getOutputStream(), true);
 
 		objOutput = new ObjectOutputStream(socket.getOutputStream());
-		objInput = new ObjectInputStream (socket.getInputStream());
-	
+		objInput = new ObjectInputStream(socket.getInputStream());
+
 		state = STATE.LOGGING;
 		System.out.println("[P2SConnection.Connect()] ");
 		send(P2SProtocol.LOGIN);
 		send(peer.peerLogin);
 		thread = new Thread(this);
-		thread.start();		
+		thread.start();
 	}
 
 	public void run() {
-		while (!close)
-		{
+		while (!close) {
 			try {
 				System.out.println("P2SConnection");
 				String command = input.readLine();
@@ -85,51 +84,46 @@ public class P2SConnection extends Connection implements Runnable {
 	}
 
 	protected void HandleCommand(String command) {
-		try
-		{
-			System.out.println("[P2SConnection.HandleCommand] command: " + command);
-			//timeoutTask.cancel();
-			if ((state == STATE.LOGGING && command.equals(P2SProtocol.LOGINACK)) || command.equals(P2SProtocol.GETYOURINFO))
-			{
-				System.out.println("[P2SConnection.HandleCommand.HandleCommand] MYINFO sending");
-				state=STATE.LOGGEDIN;
+		try {
+			System.out.println("[P2SConnection.HandleCommand] command: "
+					+ command);
+			// timeoutTask.cancel();
+			if ((state == STATE.LOGGING && command.equals(P2SProtocol.LOGINACK))
+					|| command.equals(P2SProtocol.GETYOURINFO)) {
+				System.out
+						.println("[P2SConnection.HandleCommand.HandleCommand] MYINFO sending");
+				state = STATE.LOGGEDIN;
 				send(P2SProtocol.MYINFO);
 				send(peer.myInfo);
 				send(P2SProtocol.GETPEERSINFO);
-			}
-			else if(command.equals(P2SProtocol.PEERSINFO))
-			{
+			} else if (command.equals(P2SProtocol.PEERSINFO)) {
 				System.out.println("[P2SConnection.HandleCommand] PEERSINFO");
-				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput.readObject();
+				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput
+						.readObject();
 				this.peer.peersInfo = Collections.synchronizedSortedMap(pi);
-				System.out.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: " + pi + "  " + pi.size());
-				
-				if(!peer.hasValidCert)
-				{
+				System.out
+						.println("[P2SConnection.HandleCommand.HandleCommand] PeersInfo: "
+								+ pi + "  " + pi.size());
+
+				if (!peer.hasValidCert) {
 					send(P2SProtocol.GETCERT);
 					send(peer.certInfo);
-				}
-				else
-				{
+				} else {
 					terminateConnectionGently();
-						peer.StatrListening();
+					peer.StatrListening();
 				}
-			}
-			else if  (command.equals(P2SProtocol.CERT))
-			{
-				
-				peer.storeX509cert((X509Certificate)objInput.readObject(), (KeyPair)objInput.readObject());			
+			} else if (command.equals(P2SProtocol.CERT)) {
+
+				peer.storeX509cert((X509Certificate) objInput.readObject(),
+						(KeyPair) objInput.readObject());
+				terminateConnectionGently();
+				peer.StatrListening();
+			} else if (command.equals(P2SProtocol.EXIT)) {
 				terminateConnectionGently();
 				peer.StatrListening();
 			}
-			else if  (command.equals(P2SProtocol.EXIT))
-			{
-				terminateConnectionGently();
-				peer.StatrListening();
-			}
-		}
-		catch(Exception e){
-			e.printStackTrace();			
+		} catch (Exception e) {
+			e.printStackTrace();
 			terminateConnectionWithFailure();
 		}
 	}

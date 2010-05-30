@@ -39,23 +39,24 @@ public class P2PConnection extends Connection {
 		Init();
 	}
 
-	public P2PConnection(Peer thisPeer,InetAddress addr, int port)
+	public P2PConnection(Peer thisPeer,InetAddress addr, int port) throws Exception
 	{
 		super();
 		peer =thisPeer;
 		try {
 			socket = (SSLSocket) peer.sf.createSocket(addr, port);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw e;
 		}
-		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
+/*		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
 		{
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {
 		//		System.out.println("handshakeCompleted " + arg0.toString() + arg0);						
 			}			
 		});
-
+*/
 		//s.startHandshake();
 		//to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania - wiemy jakie gniazdko dostaniemy od systemu
 		peer.myInfo = new PeerInfo(socket.getInetAddress(), peer.listeningPort);	
@@ -75,6 +76,8 @@ public class P2PConnection extends Connection {
 			e.printStackTrace();
 
 		}
+		PeerInfo pi = new PeerInfo(socket.getInetAddress(), socket.getPort());
+		peer.peersInfo.put(pi.addrMd, pi);
 		thread = new  Thread(this);
 		thread.start();
 	}
@@ -112,12 +115,20 @@ public class P2PConnection extends Connection {
 			}
 			else if(command.equals(P2PProtocol.MYFILEINFO))
 			{			
-				peer.someoneFiles.add((FileInfo) objInput.readObject());
+				FileInfo fi = (FileInfo) objInput.readObject();
+				if(!peer.someoneFiles.add(fi))
+				{//wpis juz byl!
+					peer.someoneFiles.tailSet(fi).first().ownersInfo.add(peer.myInfo);
+				}
 				terminateConnectionGently();
 			}
 			else if(command.equals(P2PProtocol.MYFILEINFOBUCKUP))
 			{
-				peer.backUpFiles.add((FileInfo) objInput.readObject());
+				FileInfo fi = (FileInfo) objInput.readObject();
+				if(!peer.backUpFiles.add(fi))
+				{//wpis juz byl!
+					peer.backUpFiles.tailSet(fi).first().ownersInfo.add(peer.myInfo);
+				}
 				terminateConnectionGently();
 			}
 
@@ -140,5 +151,10 @@ public class P2PConnection extends Connection {
 		System.out.println("[P2PConnection.sendBackUpFileInfo] " + this.socket.getInetAddress());
 		send(P2PProtocol.MYFILEINFOBUCKUP);
 		send(fi);	
+	}
+
+	public void handleNeighbour() {
+		// TODO Auto-generated method stub
+		
 	}
 }

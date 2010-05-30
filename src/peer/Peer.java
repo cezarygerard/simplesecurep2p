@@ -12,10 +12,14 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -30,6 +34,7 @@ import javax.security.auth.x500.X500Principal;
 import common.FileInfo;
 import common.PeerInfo;
 import common.PeerLoginInfo;
+import common.utils;
 
 
 /**
@@ -40,9 +45,13 @@ import common.PeerLoginInfo;
 public class Peer implements Runnable {
 
 	SortedMap <String, PeerInfo > peersInfo = Collections.synchronizedSortedMap(new TreeMap<String, PeerInfo>());
-	SortedSet<FileInfo> sharedFiles = Collections.synchronizedSortedSet(new TreeSet<FileInfo>());
-	SortedSet<FileInfo> someoneFiles = Collections.synchronizedSortedSet(new TreeSet<FileInfo>());
-	SortedSet<FileInfo> backUpFiles = Collections.synchronizedSortedSet(new TreeSet<FileInfo>());
+//	SortedSet<List<FileInfo>> sharedFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
+//	SortedSet<List<FileInfo>> someoneFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
+//	SortedSet<List<FileInfo>> backUpFiles = Collections.synchronizedSortedSet(new TreeSet< List<FileInfo> > ());
+	SortedSet<FileInfo> sharedFiles = Collections.synchronizedSortedSet(new TreeSet< FileInfo > ());
+	SortedSet<FileInfo> someoneFiles = Collections.synchronizedSortedSet(new TreeSet< FileInfo > ());
+	SortedSet<FileInfo> backUpFiles = Collections.synchronizedSortedSet(new TreeSet< FileInfo > ());
+
 	private KeyStore trustedKeystore;
 	private KeyStore myKeystore;
 	private TrustManagerFactory tmf;
@@ -54,7 +63,8 @@ public class Peer implements Runnable {
 	PeerLoginInfo peerLogin;
 	PeerInfo myInfo;
 	X500Principal certInfo;
-
+	Timer neighbourRecognitionTimer;
+	
 	///elementy potrzebne do nasluchowania
 	private SSLServerSocketFactory ssf;
 	private SSLServerSocket ss;
@@ -150,7 +160,7 @@ public class Peer implements Runnable {
 		}
 
 		sendOutMyFilesInfo();
-
+		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
@@ -169,6 +179,40 @@ public class Peer implements Runnable {
 				}
 			}
 		}
+	}
+
+	private TimerTask rocognizeNeighbour() {
+		final Peer p = this;
+		final PeerInfo neighbour;
+		String neighbourKey = null;
+		SortedMap<String, PeerInfo > sm = this.peersInfo.headMap(this.myInfo.addrMd);
+		if(sm != null && sm.size() > 0)
+		{
+			neighbourKey = (String) sm.lastKey();
+		}
+		
+		if(neighbourKey == null)
+			neighbourKey = this.peersInfo.lastKey();
+		
+		neighbour = this.peersInfo.get(neighbourKey);
+		
+		return new TimerTask() {
+			
+			@Override
+			public void run() {				
+				try {
+					(new P2PConnection(p, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					p.peerDeathNotify();
+				}
+			}
+		};		
+	}
+
+	protected void peerDeathNotify() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {
@@ -262,28 +306,44 @@ public class Peer implements Runnable {
 			{
 				Thread t =new Thread(new Runnable() {
 					public void run() {
-						new P2PConnection(p, infoOwner.addr, infoOwner.listeningPort).sendFileInfo(fi);			
+						try {
+							new P2PConnection(p, infoOwner.addr, infoOwner.listeningPort).sendFileInfo(fi);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}			
 					}
 				});
 				t.start();
 			}
 			else
 			{
-				this.someoneFiles.add(fi);
+				if(!this.someoneFiles.add(fi))
+				{//wpis juz byl!
+					this.someoneFiles.tailSet(fi).first().ownersInfo.add(this.myInfo);
+				}
 			}
 
 			if(!(buckupOwner.equals(this.myInfo)))
 			{
 				Thread t1 =new Thread(new Runnable() {
 					public void run() {
-						new P2PConnection(p, buckupOwner.addr, buckupOwner.listeningPort).sendBackUpFileInfo(fi);			
+						try {
+							new P2PConnection(p, buckupOwner.addr, buckupOwner.listeningPort).sendBackUpFileInfo(fi);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}			
 					}
 				});
 				t1.start();
 			}
 			else
 			{
-				this.backUpFiles.add(fi);
+				if(!this.backUpFiles.add(fi))
+				{//wpis juz byl!
+					this.backUpFiles.tailSet(fi).first().ownersInfo.add(this.myInfo);
+				}
 			}
 		}
 	}		

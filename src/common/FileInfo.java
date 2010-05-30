@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -45,8 +48,7 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 	public long size;
 	transient File file;
 	public String nameMD;
-	
-	public PeerInfo ownerInfo;
+	public List<PeerInfo> ownersInfo = Collections.synchronizedList(new ArrayList<PeerInfo>());
 
 	
 	public int compareTo(FileInfo arg0) {
