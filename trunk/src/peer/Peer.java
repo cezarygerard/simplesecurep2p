@@ -151,7 +151,7 @@ public class Peer implements Runnable {
 	public void run() {
 		try {
 			this.kmf.init(myKeystore, "123456".toCharArray());
-		//	this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 			this.sc.init(kmf.getKeyManagers(), null, null);
 			this.ssf = sc.getServerSocketFactory();
 			this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
@@ -187,18 +187,10 @@ public class Peer implements Runnable {
 	private TimerTask rocognizeNeighbour() {
 		final Peer p = this;
 		final PeerInfo neighbour;
-		String neighbourKey = null;
-		SortedMap<String, PeerInfo > sm = this.peersInfo.headMap(this.myInfo.addrMd);
-		if(sm != null && sm.size() > 0)
-		{
-			neighbourKey = (String) sm.lastKey();
-		}
-
-		if(neighbourKey == null)
-			neighbourKey = this.peersInfo.lastKey();
-
-		neighbour = this.peersInfo.get(neighbourKey);
-		if(!(neighbour.equals(this.myInfo)))
+		
+		neighbour = getNextPeerInfo(this.myInfo.addrMd);
+		
+		if(!(neighbour.equals(this.myInfo)) && neighbour != null )
 		{
 			return new TimerTask() {
 
@@ -208,7 +200,7 @@ public class Peer implements Runnable {
 						(new P2PConnection(p, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
-						p.peerDeathHandler(neighbour);
+						p.handlerPeerDeath(neighbour);
 					}
 				}
 			};		
@@ -223,8 +215,39 @@ public class Peer implements Runnable {
 			}
 		};
 	}
+	
+	private  PeerInfo getNextPeerInfo(String key)
+	{
+		String validKey = null;
+		//SortedMap<String, PeerInfo > sm = this.peersInfo.tailMap(key);
+		TreeMap<String, PeerInfo> tm = new TreeMap<String, PeerInfo>(this.peersInfo.tailMap(key));
+		if(tm != null && tm.size() > 0)
+		{
+			validKey = (String) tm.higherKey(key);
+		}
 
-	protected void peerDeathHandler(final PeerInfo neighbour) {
+		if(validKey == null)
+			validKey = this.peersInfo.firstKey();
+		
+		return  this.peersInfo.get(validKey);
+	}
+	
+	private PeerInfo getPrevPeerInfo(String key)
+	{
+		String validKey = null;
+		SortedMap<String, PeerInfo > sm = this.peersInfo.headMap(key);
+		if(sm != null && sm.size() > 0)
+		{
+			validKey = (String) sm.lastKey();
+		}
+
+		if(validKey == null)
+			validKey = this.peersInfo.lastKey();
+		
+		return  this.peersInfo.get(validKey);
+	}
+
+	protected void handlerPeerDeath(final PeerInfo neighbour) {
 		System.out.println("[Peer.peerDeathNotify] " + neighbour);
 		this.peersInfo.remove(neighbour.addrMd);
 		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
@@ -236,8 +259,51 @@ public class Peer implements Runnable {
 				P2SConnection p2s = new P2SConnection(p,p.serverInfo.addr, p.serverInfo.listeningPort);
 				p2s.peerDeathNotification(neighbour);
 			}
-		}, " peerDeathHandler " + neighbour);
+		}, "handlerPeerDeath, peerDeathNotification " + neighbour);
 		t.start();
+		this.someoneFiles.addAll(this.backUpFiles);
+		this.backUpFiles.clear();
+		
+		
+		final PeerInfo nexyPeer = getNextPeerInfo(this.myInfo.addrMd);	
+		if(!(nexyPeer.equals(this.myInfo)) && nexyPeer != null )
+		{
+			Thread t1 = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					P2PConnection p2p;
+					try {
+						p2p = new P2PConnection(p, nexyPeer.addr, nexyPeer.listeningPort);
+						p2p.getNewBackUp();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}, "handlerPeerDeath getNewBackUp " + neighbour);
+			t1.start();
+		}
+		
+		final PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);	
+		if(!(prevPeer.equals(this.myInfo)) && prevPeer != null )
+		{
+			Thread t2 = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					P2PConnection p2p;
+					try {
+						p2p = new P2PConnection(p, prevPeer.addr, prevPeer.listeningPort);
+						p2p.setNewBackUp();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}, "handlerPeerDeath setNewBackUp " + neighbour);
+			t2.start();
+		}
 	}
 
 	void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {
