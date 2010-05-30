@@ -12,7 +12,10 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -36,10 +39,10 @@ import common.PeerLoginInfo;
  */
 public class Peer implements Runnable {
 
-	TreeMap<String, PeerInfo > peersInfo = new TreeMap<String, PeerInfo>();
-	TreeSet<FileInfo > sharedFiles = new TreeSet<FileInfo>();
-	TreeSet<FileInfo > someoneFiles = new TreeSet<FileInfo>();
-	TreeSet<FileInfo > backUpFiles = new TreeSet<FileInfo>();
+	SortedMap <String, PeerInfo > peersInfo = Collections.synchronizedSortedMap(new TreeMap<String, PeerInfo>());
+	SortedSet<FileInfo> sharedFiles = Collections.synchronizedSortedSet(new TreeSet<FileInfo>());
+	SortedSet<FileInfo> someoneFiles = Collections.synchronizedSortedSet(new TreeSet<FileInfo>());
+	SortedSet<FileInfo> backUpFiles = Collections.synchronizedSortedSet(new TreeSet<FileInfo>());
 	private KeyStore trustedKeystore;
 	private KeyStore myKeystore;
 	private TrustManagerFactory tmf;
@@ -212,7 +215,10 @@ public class Peer implements Runnable {
 			}
 		}
 	}
-
+ 
+	/**
+	 * @Todo optymalizacji poprzez grupowania plikow do poszczegolnych peerow i przeslanie tego jednym polaczeniem
+	 */
 	void sendOutMyFilesInfo(){
 
 		for (Iterator<FileInfo> iterator = sharedFiles.iterator(); iterator.hasNext();) 
@@ -222,15 +228,24 @@ public class Peer implements Runnable {
 			//final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
 			final PeerInfo infoOwner;// = new PeerInfo(null, 0);
 			final PeerInfo buckupOwner;
-			String infoOwnerKey;// = this.peersInfo.lowerKey(fi.nameMD);
-			String buckupOwnerKey;// = 
-			infoOwnerKey = this.peersInfo.lowerKey(fi.nameMD);
-
+			String infoOwnerKey = null;// = this.peersInfo.lowerKey(fi.nameMD);
+			String buckupOwnerKey = null;// = 
+			
+			SortedMap<String, PeerInfo > sm = this.peersInfo.headMap(fi.nameMD);
+			if(sm != null && sm.size() > 0)
+			{
+				infoOwnerKey = (String) sm.lastKey();
+			}
+			
 			if(infoOwnerKey == null)
 				infoOwnerKey = this.peersInfo.lastKey();
-
-			buckupOwnerKey = this.peersInfo.lowerKey(infoOwnerKey);
-
+			
+			SortedMap<String, PeerInfo > sm1 = this.peersInfo.headMap(infoOwnerKey);
+			if(sm1 != null && sm1.size() > 0)
+			{
+				buckupOwnerKey = (String) sm1.lastKey();
+			}
+			
 			if(buckupOwnerKey == null)
 				buckupOwnerKey = this.peersInfo.lastKey();
 
@@ -241,7 +256,7 @@ public class Peer implements Runnable {
 			final Peer p = this;
 
 
-			if(infoOwner != this.myInfo)
+			if(!(infoOwner.equals(this.myInfo)))
 			{
 				Thread t =new Thread(new Runnable() {
 					public void run() {
@@ -256,7 +271,7 @@ public class Peer implements Runnable {
 				continue;
 			}
 
-			if(buckupOwner != this.myInfo)
+			if(!(buckupOwner.equals(this.myInfo)))
 			{
 				Thread t1 =new Thread(new Runnable() {
 					public void run() {
@@ -270,7 +285,6 @@ public class Peer implements Runnable {
 				this.backUpFiles.add(fi);
 				continue;
 			}
-
 		}
 	}		
 }
