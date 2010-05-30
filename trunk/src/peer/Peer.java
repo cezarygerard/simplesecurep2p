@@ -249,12 +249,14 @@ public class Peer implements Runnable {
 			if(buckupOwnerKey == null)
 				buckupOwnerKey = this.peersInfo.lastKey();
 
-			System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwnerKey: " + infoOwnerKey + " buckupOwnerKey "  + buckupOwnerKey + "myinfo: " + this.myInfo.addrMd);
+		
 			infoOwner = this.peersInfo.get(infoOwnerKey);
 			buckupOwner = this.peersInfo.get(buckupOwnerKey);
 
 			final Peer p = this;
-
+			
+			System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwnerKey: " + infoOwnerKey + " buckupOwnerKey "  + buckupOwnerKey + " myinfo: " + this.myInfo.addrMd);
+			System.out.println("[Peer.sendOutMyFilesInfo] srkoty peerow: infoOwner.equals(this.myInfo): " + infoOwner.equals(this.myInfo) + " (buckupOwner.equals(this.myInfo)) "  + (buckupOwner.equals(this.myInfo)));
 
 			if(!(infoOwner.equals(this.myInfo)))
 			{
@@ -268,7 +270,6 @@ public class Peer implements Runnable {
 			else
 			{
 				this.someoneFiles.add(fi);
-				continue;
 			}
 
 			if(!(buckupOwner.equals(this.myInfo)))
@@ -283,7 +284,6 @@ public class Peer implements Runnable {
 			else
 			{
 				this.backUpFiles.add(fi);
-				continue;
 			}
 		}
 	}		

@@ -129,7 +129,7 @@ public class P2PConnection extends Connection {
 	}
 
 	public void sendFileInfo(FileInfo fi) {
-		
+		System.out.println("[P2PConnection.sendFileInfo] " + this.socket.getInetAddress());
 		send(P2PProtocol.MYFILEINFO);
 		send(fi);
 		//terminateConnectionGently();
@@ -137,7 +137,7 @@ public class P2PConnection extends Connection {
 
 	public void sendBackUpFileInfo(FileInfo fi) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("[P2PConnection.sendBackUpFileInfo] " + this.socket.getInetAddress());
 		send(P2PProtocol.MYFILEINFOBUCKUP);
 		send(fi);	
 	}
