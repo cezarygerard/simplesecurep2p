@@ -12,7 +12,7 @@ import java.util.Enumeration;
  */
 public class utils {
 
-	public static final int NEIGHBOUR_RECOGNITION_PERIOD = 120000;//ms
+	public static final int NEIGHBOUR_RECOGNITION_PERIOD = 30000;//ms
 
 	/**
 	 * Metoda do wygodnego obliczania skrotu

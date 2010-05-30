@@ -170,5 +170,6 @@ public class P2PConnection extends Connection {
 	public void handleNeighbour() {
 		System.out.println("[P2PConnection.handleNeighbour] " + this.socket.getInetAddress());
 		send(P2PProtocol.NEIGHBOUR_RECOGNITION_INIT);
+	
 	}
 }
