@@ -99,7 +99,7 @@ public class P2PConnection extends Connection {
 				try {
 					close  = true;
 					socket.close();
-				} catch (IOException e1) {
+				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 					terminateConnectionWithFailure();
@@ -137,6 +137,7 @@ public class P2PConnection extends Connection {
 			{
 				send(P2PProtocol.NEIGHBOUR_RECOGNITION_ACK);
 				send(new TreeSet<FileInfo>(peer.someoneFiles));
+				terminateConnectionGently();
 			}
 			else if (command.equals(P2PProtocol.NEIGHBOUR_RECOGNITION_ACK))
 			{

@@ -223,10 +223,8 @@ public class Peer implements Runnable {
 
 	protected void peerDeathNotify(PeerInfo neighbour) {
 		System.out.println("[Peer.peerDeathNotify] " + neighbour);
-		neighbourRecognitionTimer.cancel();
 		this.peersInfo.remove(neighbour.addrMd);
 		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
-		
 	}
 
 	void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {
