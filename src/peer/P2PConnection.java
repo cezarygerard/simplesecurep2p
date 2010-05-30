@@ -174,4 +174,14 @@ public class P2PConnection extends Connection {
 		send(P2PProtocol.NEIGHBOUR_RECOGNITION_INIT);
 	
 	}
+
+	public void getNewBackUp() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setNewBackUp() {
+		// TODO Auto-generated method stub
+		
+	}
 }
