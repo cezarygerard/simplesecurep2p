@@ -8,6 +8,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
@@ -32,7 +34,7 @@ public class P2PConnection extends Connection {
 		super();
 		System.out.println("[P2PConnection]");
 		this.socket = (SSLSocket) accept;
-		
+
 		//	System.out.println(socket.getRemoteSocketAddress());
 		//	System.out.println(socket.getLocalSocketAddress());
 		peer =thisPeer;
@@ -50,13 +52,13 @@ public class P2PConnection extends Connection {
 			e.printStackTrace();
 			throw e;
 		}
-/*		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
+		/*		socket.addHandshakeCompletedListener(new HandshakeCompletedListener ()
 		{
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {
 		//		System.out.println("handshakeCompleted " + arg0.toString() + arg0);						
 			}			
 		});
-*/
+		 */
 		//s.startHandshake();
 		//to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania - wiemy jakie gniazdko dostaniemy od systemu
 		peer.myInfo = new PeerInfo(socket.getInetAddress(), peer.listeningPort);	
@@ -111,9 +113,9 @@ public class P2PConnection extends Connection {
 		try {
 			if(command.equals(P2PProtocol.EXIT))
 			{
-					terminateConnectionGently();			
+				terminateConnectionGently();			
 			}
-			else if(command.equals(P2PProtocol.MYFILEINFO))
+			else if(command.equals(P2PProtocol.MY_FILE_INFO))
 			{			
 				FileInfo fi = (FileInfo) objInput.readObject();
 				if(!peer.someoneFiles.add(fi))
@@ -122,7 +124,7 @@ public class P2PConnection extends Connection {
 				}
 				terminateConnectionGently();
 			}
-			else if(command.equals(P2PProtocol.MYFILEINFOBUCKUP))
+			else if(command.equals(P2PProtocol.MY_FILE_INFO_BUCKUP))
 			{
 				FileInfo fi = (FileInfo) objInput.readObject();
 				if(!peer.backUpFiles.add(fi))
@@ -131,30 +133,42 @@ public class P2PConnection extends Connection {
 				}
 				terminateConnectionGently();
 			}
+			else if(command.equals(P2PProtocol.NEIGHBOUR_RECOGNITION_INIT))
+			{
+				send(P2PProtocol.NEIGHBOUR_RECOGNITION_ACK);
+				send(new TreeSet<FileInfo>(peer.someoneFiles));
+			}
+			else if (command.equals(P2PProtocol.NEIGHBOUR_RECOGNITION_ACK))
+			{
+				TreeSet<FileInfo> files_info = (TreeSet<FileInfo>) objInput.readObject();
+				if(!peer.backUpFiles.containsAll(files_info))
+				{
+					peer.backUpFiles.addAll(files_info);
+				}
+			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-	
+
 		}
 	}
 
 	public void sendFileInfo(FileInfo fi) {
 		System.out.println("[P2PConnection.sendFileInfo] " + this.socket.getInetAddress());
-		send(P2PProtocol.MYFILEINFO);
+		send(P2PProtocol.MY_FILE_INFO);
 		send(fi);
 		//terminateConnectionGently();
 	}
 
 	public void sendBackUpFileInfo(FileInfo fi) {
-		// TODO Auto-generated method stub
 		System.out.println("[P2PConnection.sendBackUpFileInfo] " + this.socket.getInetAddress());
-		send(P2PProtocol.MYFILEINFOBUCKUP);
+		send(P2PProtocol.MY_FILE_INFO_BUCKUP);
 		send(fi);	
 	}
 
 	public void handleNeighbour() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("[P2PConnection.handleNeighbour] " + this.socket.getInetAddress());
+		send(P2PProtocol.NEIGHBOUR_RECOGNITION_INIT);
 	}
 }

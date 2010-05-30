@@ -204,15 +204,14 @@ public class Peer implements Runnable {
 					(new P2PConnection(p, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					p.peerDeathNotify();
+					p.peerDeathNotify(neighbour);
 				}
 			}
 		};		
 	}
 
-	protected void peerDeathNotify() {
-		// TODO Auto-generated method stub
-		
+	protected void peerDeathNotify(PeerInfo neighbour) {
+		System.out.println("[Peer.peerDeathNotify] " + neighbour);
 	}
 
 	void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {
