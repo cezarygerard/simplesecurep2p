@@ -166,9 +166,9 @@ public class Peer implements Runnable {
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
-				for (int i = 0; i < this.ss.getEnabledCipherSuites().length; i++) {
-					System.out.println(this.ss.getEnabledCipherSuites()[i]);
-				}
+			//	for (int i = 0; i < this.ss.getEnabledCipherSuites().length; i++) {
+			//		System.out.println(this.ss.getEnabledCipherSuites()[i]);
+			//	}
 				new P2PConnection(this.ss.accept(), this);
 
 			} catch (Exception e1) {
@@ -199,7 +199,7 @@ public class Peer implements Runnable {
 						(new P2PConnection(p, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
-						p.handlerPeerDeath(neighbour);
+						p.handlePeerDeath(neighbour);
 					}
 				}
 			};		
@@ -246,9 +246,11 @@ public class Peer implements Runnable {
 		return  this.peersInfo.get(validKey);
 	}
 
-	protected void handlerPeerDeath(final PeerInfo neighbour) {
+	protected void handlePeerDeath(final PeerInfo neighbour) {
 		System.out.println("[Peer.peerDeathNotify] " + neighbour);
 		this.peersInfo.remove(neighbour.addrMd);
+		neighbourRecognitionTimer.cancel();
+		neighbourRecognitionTimer = new Timer();
 		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		final Peer p = this;
 		Thread t = new Thread(new Runnable() {

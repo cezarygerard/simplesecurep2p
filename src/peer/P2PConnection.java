@@ -61,7 +61,6 @@ public class P2PConnection extends Connection {
 		 */
 		//s.startHandshake();
 		//to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania - wiemy jakie gniazdko dostaniemy od systemu
-		peer.myInfo = new PeerInfo(socket.getInetAddress(), peer.listeningPort);	
 		Init();
 	}
 
@@ -177,11 +176,11 @@ public class P2PConnection extends Connection {
 
 	public void getNewBackUp() {
 		// TODO Auto-generated method stub
-		
+		System.out.println("[P2PConnection.getNewBackUp] " + this.socket.getInetAddress());
 	}
 
 	public void setNewBackUp() {
 		// TODO Auto-generated method stub
-		
+		System.out.println("[P2PConnection.setNewBackUp] " + this.socket.getInetAddress());
 	}
 }
