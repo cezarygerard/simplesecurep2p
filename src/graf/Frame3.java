@@ -19,11 +19,14 @@ import common.PeerActionObserver;
  *
  * @author Klauduœ
  */
-public class Frame3 extends javax.swing.JFrame {
+public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 
     /** Creates new form Frame3 */
     public Frame3() {
         initComponents();
+      //  FileInfo fi = new FileInfo();
+      ///  name = fi.getName();
+       // type = fi.getType();
     }
 
     DefaultTableModel tmcontekst = new DefaultTableModel(null, new String[]{"id", "nazwa", "rozmiar", "infopeer"} );
@@ -151,10 +154,11 @@ public class Frame3 extends javax.swing.JFrame {
         namefile1 =this.namefile.getText();
        
         
-       
-       // this.activePeer = Peer.createPeer(server1, serverport2, userport2, login1, password1, null);
-     //   this.activePeer.fileActionObserver(this);
-       fileActionPerformed(namefile1);
+      FileInfo fi = new FileInfo();
+      name = fi.getName();
+      type = fi.getType();
+      
+       fileActionPerformed( ,FILE_FOUND);
        
       //  activePeer.searchForFile(s);
         //miesjce w którym bêdê œci¹gaæ plik
@@ -239,12 +243,16 @@ for (int i = 0; i<conteksty.size(); i++)
 
 	
 	
-	public void fileActionPerformed(String action) {
-		if(action.equals(PeerActionObserver.FILE_FOUND));
+	
+	
+
+	@Override
+	public void fileActionPerformed(FileInfo file, String actionType) {
+		if(actionType.equals(PeerActionObserver.FILE_FOUND));
 		{
-			Frame3 f3 = new Frame3();
+			//Frame3 f3 = new Frame3();
 			uzupTabel(conteksty);
-			f3.activePeer = this.activePeer;
+			//f3.activePeer = this.activePeer;
 			
 			
 			//f3.setVisible(true);
@@ -252,8 +260,33 @@ for (int i = 0; i<conteksty.size(); i++)
 			
 			
 		}
+		
+		if (actionType.equals(PeerActionObserver.FILE_DOWNLOADED  ))
+		{
+			//poinformuj uzytkownika
+			
+			
+		}
+		
+		
+		
 	}
 
+	
+	
+	@Override
+	public void peerActionPerformed(String action) {
+		// TODO Auto-generated method stub
+		
+	}
+
+ 	
+	
+	
+private String name;
+private String type;
+	
+	
 }
 	
 	
