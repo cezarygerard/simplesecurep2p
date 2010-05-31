@@ -249,14 +249,13 @@ public class P2PConnection extends Connection {
 					return;
 				}
 				byte[]b = new byte[1024];
-				int off = 0;
-				int len = 1024;
+				int len = 0;
 				send(P2PProtocol.DOWNLOAD_FILE_ACK);
 				send(fi);
-				while(fis.read(b, off, len) != -1)
+				while((len = fis.read(b)) != -1)
 				{
 					send(b);
-					off+=len;
+					System.out.println(len);
 				}
 				
 			}else  if (command.equals(P2PProtocol.FILE_DOWNLOAD_FAILED))
@@ -270,11 +269,13 @@ public class P2PConnection extends Connection {
 				String pathName = peer.sharedFilesDirectory + 	"/" + fi.name + "." + fi.type;
 				fos = new FileOutputStream(pathName);
 				byte[] b = new byte[1024];
-				while (objInput.read(b) != -1)
+				int len = 0;
+				while ((len = objInput.read(b)) != -1)
 				{
 					fos.write(b);
+					System.out.println(len);
 				}
-				//fos.write(b);
+				
 				fos.close();
 				terminateConnectionGently();
 				fi.file = new File(pathName);

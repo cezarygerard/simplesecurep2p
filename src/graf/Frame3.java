@@ -217,7 +217,7 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 			{
 				tmcontekst.removeRow(i);
 			}
-			String[] linia = new String[]{file.name ,file.type, file.size + " " , null};
+			String[] linia = new String[]{1 + " ", file.name ,file.type, file.size + " "};
 				tmcontekst.addRow(linia);				
 			/*	tmcontekst.setValueAt(0, 1, 0);
 				tmcontekst.setValueAt(file.name, 0, 1);
