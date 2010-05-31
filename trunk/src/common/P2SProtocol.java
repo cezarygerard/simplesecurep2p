@@ -42,5 +42,9 @@ public class P2SProtocol extends ProtocolBase {
 	public static final String PEER_DEATH_NOTIFICATION = "peerDeathNotification";
 
 	public static final String PEER_DEATH_NOTIFICATION_ACK = "peerDeathNotificationACK";
+
+	public static final String PEER_SYNCHRONIZATION_REQUEST = "PEER_SYNCHRONIZATION_REQUEST";
+	
+	public static final String PEER_SYNCHRONIZATION_ACK = "PEER_SYNCHRONIZATION_ACK";
 	
 }

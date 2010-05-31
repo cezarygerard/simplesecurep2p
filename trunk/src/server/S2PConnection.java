@@ -139,6 +139,12 @@ public class S2PConnection extends Connection implements Runnable{
 				terminateConnectionGently();
 			}
 			
+			else if (command.equals(P2SProtocol.PEER_SYNCHRONIZATION_REQUEST))
+			{
+				send(P2SProtocol.PEER_SYNCHRONIZATION_ACK);
+				send(new TreeMap<String,PeerInfo>(server.peersInfo));
+			}
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			terminateConnectionWithFailure();

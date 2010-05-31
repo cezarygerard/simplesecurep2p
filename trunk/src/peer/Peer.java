@@ -636,7 +636,9 @@ public class Peer implements Runnable {
 		{
 			observers.get(i).fileActionPerformed(fi, PeerActionObserver.FILE_FOUND);
 		}
-
+		
+		if(fi == null)
+			synchroniezeWithServer();
 	}
 	
 	void fileDownloaded(FileInfo fi) {
@@ -646,6 +648,15 @@ public class Peer implements Runnable {
 		{
 			observers.get(i).fileActionPerformed(fi,PeerActionObserver.FILE_DOWNLOADED );
 		}
+		
+		if(fi == null)
+			synchroniezeWithServer();
+	}
+	
+	void synchroniezeWithServer()
+	{
+		P2SConnection p2s = new P2SConnection(this, serverInfo.addr, serverInfo.listeningPort);
+		p2s.synchronize();
 	}
 }
 
