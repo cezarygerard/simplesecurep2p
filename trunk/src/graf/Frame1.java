@@ -1,13 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
-/*
- * Frame1.java
- *
- * Created on 2010-05-30, 12:00:37
- */
 
 package graf;
 import javax.swing.*;
@@ -278,7 +269,7 @@ public class Frame1 extends javax.swing.JFrame {
            dispose();
                   Grk2 frame2 = new Grk2();
                    frame2.setVisible(true);
-
+                   
          }
 
 
@@ -309,17 +300,7 @@ public class Frame1 extends javax.swing.JFrame {
 
 
 
-        String spr,spr2, spr3, spr4, spr5;
-        spr = login1;
-        spr2 = password1;
-        spr3 = serverport1;
-        spr4 = userport1;
-        spr5 = server1;
-
-        System.out.print("login "+spr + "haslo "+spr2 +spr3+spr4 +"    "+ spr5);
-
-
-                        //new Thread(new thread1()).start(); //Start the thread
+        
 
     }
 
