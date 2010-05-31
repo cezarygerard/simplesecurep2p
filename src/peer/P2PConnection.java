@@ -78,8 +78,7 @@ public class P2PConnection extends Connection {
 
 		}
 		PeerInfo pi = new PeerInfo(socket.getInetAddress(), socket.getPort());
-		peer.peersInfo.put(pi.addrMd, pi);
-		thread = new  Thread(this);
+		thread = new  Thread(this, "P2PCONNECTION " + socket.getInetAddress());
 		thread.start();
 	}
 
