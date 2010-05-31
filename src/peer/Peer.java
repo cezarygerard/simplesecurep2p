@@ -190,41 +190,45 @@ public class Peer implements Runnable {
 
 	private void addMyselfIntoNetwork() {
 		PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);
-		P2PConnection p2p = null ;
-		try {
-			p2p= new P2PConnection(this, prevPeer.addr,prevPeer.listeningPort);
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		final Peer p = this;
-		p2p.addTerminationListener(new TerminationListener() {
-
-			public void connectionTerminated() {
-				PeerInfo nextPeer = getNextPeerInfo((p.myInfo.addrMd));
-				try {
-					P2PConnection p2p= new P2PConnection(p, nextPeer.addr,nextPeer.listeningPort);
-					p2p.obtainBackUp();
-					p2p.addTerminationListener(new TerminationListener() {
-						
-						@Override
-						public void connectionTerminated() {
-						p.StatrListening();
-							
-						}
-					});
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
+		if(!prevPeer.equals(this.myInfo))
+		{
+			P2PConnection p2p = null ;
+			try {
+				p2p= new P2PConnection(this, prevPeer.addr,prevPeer.listeningPort);
+	
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		});
-		p2p.obtainFilesInfo();		
+	
+			final Peer p = this;
+			p2p.addTerminationListener(new TerminationListener() {
+	
+				public void connectionTerminated() {
+					PeerInfo nextPeer = getNextPeerInfo((p.myInfo.addrMd));
+					try {
+						P2PConnection p2p= new P2PConnection(p, nextPeer.addr,nextPeer.listeningPort);
+						p2p.obtainBackUp();
+						p2p.addTerminationListener(new TerminationListener() {
+							
+							@Override
+							public void connectionTerminated() {
+							p.StatrListening();
+								
+							}
+						});
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	
+				}
+			});
+			p2p.obtainFilesInfo();		
+		}
+		else 
+			this.StatrListening();
 	}
-
 	private TimerTask rocognizeNeighbour() {
 		final Peer p = this;
 		final PeerInfo neighbour;
@@ -255,6 +259,7 @@ public class Peer implements Runnable {
 
 			}
 		};
+	
 	}
 
 	private  PeerInfo getNextPeerInfo(String key)
