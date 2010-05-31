@@ -49,6 +49,7 @@ public class P2PConnection extends Connection {
 	{
 		super();
 		peer =thisPeer;
+		System.out.println("[P2PConnection()] "+ addr + "port: " + port);
 		try {
 			socket = (SSLSocket) peer.sf.createSocket(addr, port);
 		} catch (Exception e) {
@@ -204,8 +205,16 @@ public class P2PConnection extends Connection {
 				String fileMD = input.readLine();
 				send(P2PProtocol.GET_FILE_OWNER_ACK);
 				FileInfo tmp = new FileInfo(fileMD);
-				FileInfo fi = ((new TreeSet<FileInfo>(peer.someoneFiles)).subSet(tmp, true, tmp, true)).first();
-				send(fi);
+				try{
+					FileInfo fi = ((new TreeSet<FileInfo>(peer.someoneFiles)).subSet(tmp, true, tmp, true)).first();
+					send(fi);
+				}
+				catch (Exception e)
+				{
+					send(P2PProtocol.FILE_FIND_FAILED);
+					terminateConnectionWithFailure();
+					return;
+				}
 				//send(peer.someoneFiles.)
 				terminateConnectionGently();
 			}
@@ -215,17 +224,17 @@ public class P2PConnection extends Connection {
 				this.peer.fileFound(fi);
 			}else  if (command.equals(P2PProtocol.DOWNLOAD_FILE))
 			{
-				String fileName = input.readLine();
-				String fileMD = utils.toHexString(utils.MDigest(null, fileName.getBytes()));
-				FileInfo tmp = new FileInfo(fileMD);
-				FileInfo fi = ((new TreeSet<FileInfo>(peer.someoneFiles)).subSet(tmp, true, tmp, true)).first();
-				File file =	fi.file;
+				FileInfo tmp =  (FileInfo) objInput.readObject();
+				FileInfo fi;
 				FileInputStream fis;
 				try{
+					fi = ((new TreeSet<FileInfo>(peer.sharedFiles)).subSet(tmp, true, tmp, true)).first();
+					File file =	fi.file;
 					fis = new FileInputStream(file);
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 					send(P2PProtocol.FILE_DOWNLOAD_FAILED);
 					terminateConnectionWithFailure();
 					return;
@@ -262,6 +271,16 @@ public class P2PConnection extends Connection {
 				fi.file = new File(pathName);
 				peer.fileDownloaded(fi);
 			}
+			else if (command.equals(P2PProtocol.FILE_DOWNLOAD_FAILED))
+			{
+				peer.fileDownloaded(null);
+			}
+			
+			else if (command.equals(P2PProtocol.FILE_FIND_FAILED))
+			{
+				peer.fileFound(null);
+			}
+			
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -331,9 +350,9 @@ public class P2PConnection extends Connection {
 		send(fileNameMD);		
 	}
 
-	public void downloadFile(String name) {
+	public void downloadFile(FileInfo soughtFileInfo) {
 		System.out.println("[P2PConnection.downloadFile] " + this.socket.getInetAddress());
 		send(P2PProtocol.DOWNLOAD_FILE);
-		send(name);			
+		send(soughtFileInfo);			
 	}
 }

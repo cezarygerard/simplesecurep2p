@@ -42,4 +42,6 @@ public class P2PProtocol extends ProtocolBase {
 	public static final String DOWNLOAD_FILE_ACK = "downloadFileACK";
 
 	public static final String FILE_DOWNLOAD_FAILED = "FILE_DOWNLOAD_FAILED";
+
+	public static final String FILE_FIND_FAILED = "FILE_FIND_FAILED";
 }
