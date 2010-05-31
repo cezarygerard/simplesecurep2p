@@ -133,6 +133,9 @@ public class S2PConnection extends Connection implements Runnable{
 			{
 				PeerInfo pi = (PeerInfo) objInput.readObject();
 				server.peersInfo.remove(pi.addrMd);
+				send(P2SProtocol.PEER_DEATH_NOTIFICATION_ACK);
+				send(new TreeMap<String,PeerInfo>(server.peersInfo));
+				
 				terminateConnectionGently();
 			}
 			

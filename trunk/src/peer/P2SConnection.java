@@ -112,18 +112,20 @@ public class P2SConnection extends Connection implements Runnable {
 					send(peer.certInfo);
 				} else {
 					terminateConnectionGently();
-					peer.init();
 				}
 			} else if (command.equals(P2SProtocol.CERT)) {
 
 				peer.storeX509cert((X509Certificate) objInput.readObject(),
 						(KeyPair) objInput.readObject());
 				terminateConnectionGently();
-				peer.init();
 			} else if (command.equals(P2SProtocol.EXIT)) {
 				terminateConnectionGently();
-				peer.init();
+			} else if (command.equals(P2SProtocol.PEER_DEATH_NOTIFICATION_ACK)) {
+				System.out.println("[P2SConnection.HandleCommand] PEERSINFO");
+				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput.readObject();
+				this.peer.peersInfo = Collections.synchronizedSortedMap(pi);
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			terminateConnectionWithFailure();
@@ -136,6 +138,5 @@ public class P2SConnection extends Connection implements Runnable {
 		send(peer.peerLogin);
 		send(P2SProtocol.PEER_DEATH_NOTIFICATION);
 		send(deadPeerInfo);
-		
 	}
 }

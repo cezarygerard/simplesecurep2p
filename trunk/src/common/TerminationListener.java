@@ -2,5 +2,5 @@ package common;
 
 public interface TerminationListener {
 	
-	abstract public  void connectionTerminated();
+	abstract public  void connectionTerminated() throws Exception;
 }
