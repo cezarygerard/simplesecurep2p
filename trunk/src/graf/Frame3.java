@@ -7,6 +7,14 @@ import javax.swing.table.DefaultTableModel;
 import peer.P2PConnection;
 import peer.Peer;
 import common.FileInfo;
+import common.PeerActionObserver;
+
+import peer.Peer;
+
+
+import common.FileInfo;
+import common.PeerActionObserver;
+
 /**
  *
  * @author Klauduœ
@@ -143,14 +151,22 @@ public class Frame3 extends javax.swing.JFrame {
         namefile1 =this.namefile.getText();
        
         
+       
+       // this.activePeer = Peer.createPeer(server1, serverport2, userport2, login1, password1, null);
+     //   this.activePeer.fileActionObserver(this);
+       fileActionPerformed(namefile1);
+       
+      //  activePeer.searchForFile(s);
         //miesjce w którym bêdê œci¹gaæ plik
        // getPeer().searchForFile(namefile1);
         
-        uzupTabel( conteksty);
-        
+             
         
     }
 
+    
+    
+    
     private void namefileActionPerformed(java.awt.event.ActionEvent evt) {
 
 }
@@ -160,8 +176,8 @@ public class Frame3 extends javax.swing.JFrame {
 }
 
     private void dowloadActionPerformed(java.awt.event.ActionEvent evt) {
-   // P2PConnection.downloadFile(FileInfo soughtFileName);        // TODO add your handling code here:
     
+    //	f3.activePeer.downloadFile(soughtFileInfo);
     	//miejsce na œci¹gniêcie 
     	
     	//Peer.searchForFile();
@@ -169,6 +185,9 @@ public class Frame3 extends javax.swing.JFrame {
 
 
 
+    
+    
+    
     private void uzupTabel(List<Contekst> conteksty){
 if(conteksty.size() ==0){
 JOptionPane.showMessageDialog(null, "error");}
@@ -218,4 +237,24 @@ for (int i = 0; i<conteksty.size(); i++)
     // End of variables declaration
 	public Peer activePeer;
 
+	
+	
+	public void fileActionPerformed(String action) {
+		if(action.equals(PeerActionObserver.FILE_FOUND));
+		{
+			Frame3 f3 = new Frame3();
+			uzupTabel(conteksty);
+			f3.activePeer = this.activePeer;
+			
+			
+			//f3.setVisible(true);
+			//this.frame2.dispose();
+			
+			
+		}
+	}
+
 }
+	
+	
+
