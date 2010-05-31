@@ -439,7 +439,7 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 			f3.activePeer = this.activePeer;
 			f3.setVisible(true);
 			this.frame2.dispose();
-			
+			System.out.println(PeerActionObserver.CONNECTION_ESTABLISHED);
 		}
 	}
 
