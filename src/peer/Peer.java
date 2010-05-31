@@ -208,7 +208,6 @@ public class Peer implements Runnable {
 					PeerInfo nextPeer = getNextPeerInfo((p.myInfo.addrMd));
 					try {
 						P2PConnection p2p= new P2PConnection(p, nextPeer.addr,nextPeer.listeningPort);
-						p2p.obtainBackUp();
 						p2p.addTerminationListener(new TerminationListener() {
 							
 							@Override
@@ -217,6 +216,7 @@ public class Peer implements Runnable {
 								
 							}
 						});
+						p2p.obtainBackUp();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
