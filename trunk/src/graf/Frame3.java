@@ -4,7 +4,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-
+import peer.P2PConnection;
 /**
  *
  * @author Klauduœ
