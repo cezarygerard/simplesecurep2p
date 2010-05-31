@@ -18,4 +18,12 @@ public class P2PProtocol extends ProtocolBase {
 	
 	//Peer-server side
 	public static final String NEIGHBOUR_RECOGNITION_ACK = "neighbourRecognitionACK";
+
+	public static final String PEER_DEATH_NOTIFICATION = "peerDeathNotification";
+
+	public static final String GET_NEW_BACK_UP_FROM_NEXT = "getBackUp";
+	
+	public static final String SEND_BACK_UP_TO_PREV = "setNewBackUp";
+
+	public static final String GET_NEW_BACK_UP_FROM_NEXT_ACK = "getBackUpACK";
 }

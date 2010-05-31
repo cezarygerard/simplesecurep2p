@@ -35,6 +35,7 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			size = file2.length();
 		}
 	}
 
