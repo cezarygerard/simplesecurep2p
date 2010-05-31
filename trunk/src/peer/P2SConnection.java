@@ -111,14 +111,14 @@ public class P2SConnection extends Connection implements Runnable {
 					send(peer.certInfo);
 				} else {
 					terminateConnectionGently();
-					peer.StatrListening();
+					peer.init();
 				}
 			} else if (command.equals(P2SProtocol.CERT)) {
 
 				peer.storeX509cert((X509Certificate) objInput.readObject(),
 						(KeyPair) objInput.readObject());
 				terminateConnectionGently();
-				peer.StatrListening();
+				peer.init();
 			} else if (command.equals(P2SProtocol.EXIT)) {
 				terminateConnectionGently();
 				peer.init();
