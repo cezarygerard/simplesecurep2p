@@ -5,12 +5,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.KeyManagementException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,9 +79,8 @@ public class Peer implements Runnable {
 	private SSLServerSocket ss;
 
 	//public Peer(String keystore,  char[] kestorePass, int listeningPort)
-	public Peer(int listeningPort)
+	public Peer(int listeningPort) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, NoSuchProviderException, KeyManagementException, UnrecoverableKeyException
 	{
-		try {
 			FileInputStream trustedKeystoreInputS = new FileInputStream("./res/peer/key/peerTrustedKeys");
 			this.trustedKeystore = KeyStore.getInstance(KeyStore.getDefaultType());
 			this.trustedKeystore.load(trustedKeystoreInputS,"123456".toCharArray());
@@ -116,14 +121,20 @@ public class Peer implements Runnable {
 
 			String s = (new BufferedReader(new FileReader(new File("./res/peer/key/principals"))).readLine());
 			this.certInfo = new X500Principal(s);
-			//	this.myInfo = new PeerInfo(this.ss.getInetAddress(), this.listeningPort);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		
+	}
+	
+	public static Peer createPeer(String serverAddress, int serverListeningPort, int myListeningPort, String login, String password, String sharedFilesDirectory) throws IOException, KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, NoSuchProviderException{
+		Peer p = new Peer(myListeningPort);
+		p.getFiles(null);
+		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName(serverAddress), serverListeningPort);
+		p.peerLogin = new PeerLoginInfo(login, password, false);
+		p2s.Connect();
+	
+		return p;
 	}
 
-	public static void main(String[] args) throws UnknownHostException {
+	public static void main(String[] args) throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, NoSuchProviderException, IOException {
 
 		Peer p = new Peer(9795);
 		p.getFiles(null);
@@ -135,9 +146,7 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
-
+		
 		//	(new Thread(p)).start();
 		while(true)
 		{
@@ -167,7 +176,7 @@ public class Peer implements Runnable {
 	}
 	
 	public void run() {
-		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
+		neighbourRecognitionTimer.schedule(new RocognizeNeighbour(this), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
@@ -229,6 +238,30 @@ public class Peer implements Runnable {
 		else 
 			this.StatrListening();
 	}
+	
+	private class RocognizeNeighbour extends TimerTask
+	{
+		Peer thisPeer;
+		public RocognizeNeighbour(Peer thisPeer) {
+			super();
+			this.thisPeer = thisPeer;
+		}
+		public void run() {
+			 PeerInfo neighbour;
+			 neighbour = getNextPeerInfo(thisPeer.myInfo.addrMd);
+			 if(!(neighbour.equals(thisPeer.myInfo)) && neighbour != null )
+			{
+				 try {
+						(new P2PConnection(thisPeer, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						thisPeer.handlePeerDeath(neighbour);
+					}
+			}
+		}
+		
+	}
+/*	
 	private TimerTask rocognizeNeighbour() {
 		final Peer p = this;
 		final PeerInfo neighbour;
@@ -261,7 +294,7 @@ public class Peer implements Runnable {
 		};
 	
 	}
-
+*/
 	private  PeerInfo getNextPeerInfo(String key)
 	{
 		String validKey = null;
@@ -296,9 +329,9 @@ public class Peer implements Runnable {
 	protected void handlePeerDeath(final PeerInfo neighbour) {
 		System.out.println("[Peer.peerDeathNotify] " + neighbour);
 		this.peersInfo.remove(neighbour.addrMd);
-		neighbourRecognitionTimer.cancel();
-		neighbourRecognitionTimer = new Timer();
-		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
+	//	neighbourRecognitionTimer.cancel();
+	//	neighbourRecognitionTimer = new Timer();
+	//	neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		final Peer p = this;
 		Thread t = new Thread(new Runnable() {
 

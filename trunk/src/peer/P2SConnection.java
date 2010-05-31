@@ -1,6 +1,7 @@
 package peer;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -41,7 +42,7 @@ public class P2SConnection extends Connection implements Runnable {
 		p.serverInfo = new ServerInfo(addr, port);
 	}
 
-	void Connect() throws Exception {
+	void Connect() throws IOException {
 
 		socket = (SSLSocket) peer.sf.createSocket(addr, port);
 		socket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
