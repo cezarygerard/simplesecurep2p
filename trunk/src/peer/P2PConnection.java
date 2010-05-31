@@ -115,6 +115,7 @@ public class P2PConnection extends Connection {
 			else if(command.equals(P2PProtocol.MY_FILE_INFO))
 			{			
 				FileInfo fi = (FileInfo) objInput.readObject();
+				System.out.println("P2PConnection] MY_FILE_INFO " + fi);
 				if(!peer.someoneFiles.add(fi))
 				{//wpis juz byl!
 					peer.someoneFiles.tailSet(fi).first().ownersInfo.add(peer.myInfo);
@@ -124,6 +125,7 @@ public class P2PConnection extends Connection {
 			else if(command.equals(P2PProtocol.MY_FILE_INFO_BUCKUP))
 			{
 				FileInfo fi = (FileInfo) objInput.readObject();
+				System.out.println("P2PConnection] MY_FILE_INFO_BUCKUP " + fi);
 				if(!peer.backUpFiles.add(fi))
 				{//wpis juz byl!
 					peer.backUpFiles.tailSet(fi).first().ownersInfo.add(peer.myInfo);
