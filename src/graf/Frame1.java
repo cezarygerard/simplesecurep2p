@@ -278,6 +278,7 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 			System.out.println(userport);        	 
 			try{ 
 				this.activePeer = Peer.createPeer(server1, serverport2, userport2, login1, password1, null);
+				this.activePeer.addPeerActionObserver(this);
 			}
 			catch(Exception e){
 				e.printStackTrace();

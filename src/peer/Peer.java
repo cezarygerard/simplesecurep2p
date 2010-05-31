@@ -189,11 +189,15 @@ public class Peer implements Runnable {
 	}
 
 	public void run() {
+		
+		System.out.println("[Peer.run]");
 		for(int i = 0; i< observers.size() ; i++)
 		{
 			observers.get(i).peerActionPerformed(PeerActionObserver.CONNECTION_ESTABLISHED);
 		}
+		
 		neighbourRecognitionTimer.schedule(new RocognizeNeighbour(this), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
+		
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
@@ -214,7 +218,9 @@ public class Peer implements Runnable {
 		}
 	}
 
-	private void addMyselfIntoNetwork() throws Exception {
+	private void addMyselfIntoNetwork() throws Exception 
+	{
+		System.out.println("[Peer.addMyselfIntoNetwork]");
 		PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);
 		if(!prevPeer.equals(this.myInfo))
 		{
@@ -600,7 +606,7 @@ public class Peer implements Runnable {
 		return null;		
 	}	
 	
-	public void addFileActionObserver(PeerActionObserver observer)
+	public void addPeerActionObserver(PeerActionObserver observer)
 	{
 		observers.add(observer);
 		
