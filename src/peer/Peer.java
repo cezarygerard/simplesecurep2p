@@ -524,10 +524,19 @@ public class Peer implements Runnable {
 	}
 
 	public FileInfo searchForFile(String soughtFileName){
-		return null;		
+		try {
+			String 	fileNameMD = utils.toHexString(utils.MDigest(null, soughtFileName.getBytes()));
+			PeerInfo pi = getPrevPeerInfo(fileNameMD);
+			P2PConnection p2p = new P2PConnection(this, pi.addr, pi.listeningPort);
+			p2p.searchForFile(fileNameMD);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;	
 	}
 
-	public FileInfo downloadFile(FileInfo soughtFileName){
+	public FileInfo downloadFile(FileInfo soughtFileInfo){
 		return null;		
 	}	
 }

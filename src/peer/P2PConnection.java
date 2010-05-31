@@ -258,4 +258,9 @@ public class P2PConnection extends Connection {
 		send(peer.myInfo);
 		getBackUpFromNext(null);		
 	}
+
+	public void searchForFile(String fileNameMD) {
+		// TODO Auto-generated method stub
+		
+	}
 }
