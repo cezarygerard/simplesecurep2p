@@ -69,4 +69,14 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 		return nameMD.equals(((FileInfo)arg0).nameMD);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "FileInfo [desc=" + desc + ", name=" + name + ", nameMD="
+				+ nameMD + ", ownersInfo=" + ownersInfo + ", size=" + size
+				+ ", type=" + type + "]";
+	}
+
 }

@@ -77,6 +77,7 @@ public class Peer implements Runnable {
 	///elementy potrzebne do nasluchowania
 	private SSLServerSocketFactory ssf;
 	private SSLServerSocket ss;
+	private String sharedFilesDirectory;
 
 	//public Peer(String keystore,  char[] kestorePass, int listeningPort)
 	public Peer(int listeningPort) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, NoSuchProviderException, KeyManagementException, UnrecoverableKeyException
@@ -127,8 +128,8 @@ public class Peer implements Runnable {
 	public static Peer createPeer(String serverAddress, int serverListeningPort, int myListeningPort, String login, String password, String sharedFilesDirectory) throws IOException, KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException, CertificateException, Exception
 	{
 		final Peer p = new Peer(myListeningPort);
-		p.getFiles(null);
 		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName(serverAddress), serverListeningPort);
+		p.sharedFilesDirectory = sharedFilesDirectory;
 		p.peerLogin = new PeerLoginInfo(login, password, false);
 		p2s.addTerminationListener(new TerminationListener() {
 			
@@ -187,6 +188,7 @@ public class Peer implements Runnable {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		getFiles(this.sharedFilesDirectory);
 		sendOutMyFilesInfo();
 		addMyselfIntoNetwork();
 	}
@@ -494,7 +496,7 @@ public class Peer implements Runnable {
 		{
 			synchronized (this) {
 				final FileInfo fi = iterator.next();
-
+				System.out.println("[Peer.sendOutMyFilesInfo] " + fi.ownersInfo); 
 				//final PeerInfo pi = this.peersInfo.get(this.peersInfo.lowerKey(fi.nameMD));
 				PeerInfo infoOwner;// = new PeerInfo(null, 0);
 				PeerInfo buckupOwner;
@@ -617,6 +619,7 @@ public class Peer implements Runnable {
 	
 	void fileFound(FileInfo fi) {
 		// TODO Auto-generated method stub
+		System.out.println(fi);
 		for(int i = 0; i< observers.size() ; i++)
 		{
 			observers.get(i).fileActionPerformed(fi, PeerActionObserver.FILE_FOUND);
