@@ -121,7 +121,7 @@ public class P2SConnection extends Connection implements Runnable {
 				peer.StatrListening();
 			} else if (command.equals(P2SProtocol.EXIT)) {
 				terminateConnectionGently();
-				peer.StatrListening();
+				peer.init();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -136,8 +136,8 @@ public class Peer implements Runnable {
 			e.printStackTrace();
 		}
 
-		
-		
+
+
 		//	(new Thread(p)).start();
 		while(true)
 		{
@@ -150,7 +150,7 @@ public class Peer implements Runnable {
 		}
 	}
 
-	public void run() {
+	public void init() {
 		try {
 			this.kmf.init(myKeystore, "123456".toCharArray());
 			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
@@ -162,17 +162,18 @@ public class Peer implements Runnable {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		sendOutMyFilesInfo();
 		addMyselfIntoNetwork();
-
+	}
+	
+	public void run() {
 		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		while (true) {
 			//new Server(ss.accept()).start();
 			try {
-			//	for (int i = 0; i < this.ss.getEnabledCipherSuites().length; i++) {
-			//		System.out.println(this.ss.getEnabledCipherSuites()[i]);
-			//	}
+				//	for (int i = 0; i < this.ss.getEnabledCipherSuites().length; i++) {
+				//		System.out.println(this.ss.getEnabledCipherSuites()[i]);
+				//	}
 				new P2PConnection(this.ss.accept(), this);
 
 			} catch (Exception e1) {
@@ -192,26 +193,33 @@ public class Peer implements Runnable {
 		P2PConnection p2p = null ;
 		try {
 			p2p= new P2PConnection(this, prevPeer.addr,prevPeer.listeningPort);
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		final Peer p = this;
 		p2p.addTerminationListener(new TerminationListener() {
-		
 
 			public void connectionTerminated() {
 				PeerInfo nextPeer = getNextPeerInfo((p.myInfo.addrMd));
 				try {
 					P2PConnection p2p= new P2PConnection(p, nextPeer.addr,nextPeer.listeningPort);
 					p2p.obtainBackUp();
+					p2p.addTerminationListener(new TerminationListener() {
+						
+						@Override
+						public void connectionTerminated() {
+						p.StatrListening();
+							
+						}
+					});
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 			}
 		});
 		p2p.obtainFilesInfo();		
@@ -220,9 +228,9 @@ public class Peer implements Runnable {
 	private TimerTask rocognizeNeighbour() {
 		final Peer p = this;
 		final PeerInfo neighbour;
-		
+
 		neighbour = getNextPeerInfo(this.myInfo.addrMd);
-		
+
 		if(!(neighbour.equals(this.myInfo)) && neighbour != null )
 		{
 			return new TimerTask() {
@@ -248,7 +256,7 @@ public class Peer implements Runnable {
 			}
 		};
 	}
-	
+
 	private  PeerInfo getNextPeerInfo(String key)
 	{
 		String validKey = null;
@@ -261,10 +269,10 @@ public class Peer implements Runnable {
 
 		if(validKey == null)
 			validKey = this.peersInfo.firstKey();
-		
+
 		return  this.peersInfo.get(validKey);
 	}
-	
+
 	private PeerInfo getPrevPeerInfo(String key)
 	{
 		String validKey = null;
@@ -276,7 +284,7 @@ public class Peer implements Runnable {
 
 		if(validKey == null)
 			validKey = this.peersInfo.lastKey();
-		
+
 		return  this.peersInfo.get(validKey);
 	}
 
@@ -288,7 +296,7 @@ public class Peer implements Runnable {
 		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		final Peer p = this;
 		Thread t = new Thread(new Runnable() {
-		
+
 			@Override
 			public void run() {
 				P2SConnection p2s = new P2SConnection(p,p.serverInfo.addr, p.serverInfo.listeningPort);
@@ -298,13 +306,13 @@ public class Peer implements Runnable {
 		t.start();
 		this.someoneFiles.addAll(this.backUpFiles);
 		this.backUpFiles.clear();
-		
-		
+
+
 		final PeerInfo nexyPeer = getNextPeerInfo(this.myInfo.addrMd);	
 		if(!(nexyPeer.equals(this.myInfo)) && nexyPeer != null )
 		{
 			Thread t1 = new Thread(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					P2PConnection p2p;
@@ -319,12 +327,12 @@ public class Peer implements Runnable {
 			}, "handlerPeerDeath getNewBackUp " + neighbour);
 			t1.start();
 		}
-		
+
 		final PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);	
 		if(!(prevPeer.equals(this.myInfo)) && prevPeer != null )
 		{
 			Thread t2 = new Thread(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					P2PConnection p2p;
@@ -451,7 +459,7 @@ public class Peer implements Runnable {
 				final PeerInfo finalInfoOwner = infoOwner;
 				final PeerInfo finalbuckupOwner = buckupOwner; 
 				Thread t = new Thread(new Runnable() {
-					
+
 					@Override
 					public void run() {
 						if(finalInfoOwner != null)
@@ -461,26 +469,26 @@ public class Peer implements Runnable {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}			
-						if(finalbuckupOwner != null)
-							try {
-								new P2PConnection(p, finalbuckupOwner.addr, finalbuckupOwner.listeningPort).sendBackUpFileInfo(fi);
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						
+							if(finalbuckupOwner != null)
+								try {
+									new P2PConnection(p, finalbuckupOwner.addr, finalbuckupOwner.listeningPort).sendBackUpFileInfo(fi);
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
 					}
 				}, " send file infos  finalInfoOwner: " + finalInfoOwner +  " finalbuckupOwner: " + finalbuckupOwner);
-			
+
 				t.start();
 			}
 		}		
 	}
-	
+
 	public FileInfo searchForFile(String soughtFileName){
 		return null;		
 	}
-	
+
 	public FileInfo downloadFile(FileInfo soughtFileName){
 		return null;		
 	}	
