@@ -423,14 +423,15 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 	private javax.swing.JTextField serverport;
 	private javax.swing.JTextField userport;
 	// End of variables declaration                   
-	@Override
+
+
 	public void fileActionPerformed(FileInfo file, String actionType) {
-		// TODO Auto-generated method stub
+
 
 	}
 
 
-	@Override
+
 	public void peerActionPerformed(String action) {
 		if(action.equals(PeerActionObserver.CONNECTION_ESTABLISHED));
 		{
@@ -438,6 +439,7 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 			f3.activePeer = this.activePeer;
 			f3.setVisible(true);
 			this.frame2.dispose();
+			
 		}
 	}
 

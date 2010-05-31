@@ -150,6 +150,7 @@ public class Peer implements Runnable {
 	public static void main(String[] args) throws Exception {
 
 		Peer p =  createPeer("192.168.1.3", 9995, 9975, "czarek", "12345", null);
+		
 /*		p.getFiles(null);
 		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.1.3"), 9995);
 		p.peerLogin = new PeerLoginInfo("czarek", "12345", false);
@@ -164,11 +165,13 @@ public class Peer implements Runnable {
 		while(true)
 		{
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(10000 + utils.NEIGHBOUR_RECOGNITION_PERIOD * 2);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			///@Debug
+			p.searchForFile("XXX");
 		}
 	}
 
