@@ -14,6 +14,9 @@ package graf;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.*;
+
+import peer.Peer;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -233,5 +236,6 @@ public void run(){
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel serach;
     // End of variables declaration
+	public Peer activePeer;
 
 }
