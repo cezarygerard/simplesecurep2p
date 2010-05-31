@@ -6,6 +6,10 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -64,6 +68,8 @@ public abstract class Connection implements Runnable {
 	//	timer = new Timer();
 		close = false;
 	}
+	
+	List<TerminationListener> listeners = Collections.synchronizedList(new ArrayList<TerminationListener>());
 
 	/**
 	 * metoda obslugujaca komendy protokolu
@@ -130,10 +136,19 @@ public abstract class Connection implements Runnable {
 		try {
 			thread.join(1000);
 			socket.close();
+			for(int i = 0; i< listeners.size() ; i++)
+			{
+				listeners.get(i).connectionTerminated();
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
+	public void addTerminationListener(TerminationListener listener)
+	{
+		listeners.add(listener);
+		
+	}
 }

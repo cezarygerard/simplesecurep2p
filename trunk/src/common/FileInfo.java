@@ -39,6 +39,11 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 		}
 	}
 
+	public FileInfo(String nameMD_)
+	{
+		super();
+		this.nameMD = nameMD_;
+	}
 	/**
 	 * 
 	 */

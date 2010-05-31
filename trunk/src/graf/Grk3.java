@@ -11,6 +11,7 @@
 
 package graf;
 
+//import javax.persistence*;
 /**
  *
  * @author Klauduœ
@@ -31,7 +32,7 @@ public class Grk3 extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
-        query1 = java.beans.Beans.isDesignTime() ? null : ((javax.persistence.EntityManager)null).createQuery("");
+ //       query1 = java.beans.Beans.isDesignTime() ? null : ((javax.persistence.EntityManager)null).createQuery("");
         menuBar1 = new java.awt.MenuBar();
         menu1 = new java.awt.Menu();
         menu2 = new java.awt.Menu();
@@ -186,7 +187,7 @@ public class Grk3 extends javax.swing.JFrame {
     private java.awt.Menu menu2;
     private java.awt.MenuBar menuBar1;
     private javax.swing.JTextField namefile;
-    private javax.persistence.Query query1;
+  //  private javax.persistence.Query query1;
     private javax.swing.JButton search;
     // End of variables declaration                   
 

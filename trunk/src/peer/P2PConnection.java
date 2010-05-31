@@ -161,10 +161,8 @@ public class P2PConnection extends Connection {
 			else if (command.equals(P2PProtocol.SEND_BACK_UP_TO_PREV))
 			{
 				TreeSet<FileInfo> files_info = (TreeSet<FileInfo>) objInput.readObject();
-				if(!peer.backUpFiles.containsAll(files_info))
-				{
-					peer.backUpFiles.addAll(files_info);
-				}
+				peer.backUpFiles.clear();
+				peer.backUpFiles.addAll(files_info);
 				terminateConnectionGently();
 			}
 			else if (command.equals(P2PProtocol.GET_NEW_BACK_UP_FROM_NEXT_ACK))
@@ -176,8 +174,23 @@ public class P2PConnection extends Connection {
 				}
 				terminateConnectionGently();
 			}
-					
-					
+			else if (command.equals(P2PProtocol.GET_FILES_INFO))
+			{
+				PeerInfo pi = (PeerInfo) objInput.readObject();
+				this.peer.peersInfo.put(pi.addrMd, pi);
+				send(P2PProtocol.GET_FILES_INFO_ACK);			
+				send(new TreeSet<FileInfo>(this.peer.someoneFiles.tailSet(new FileInfo(pi.addrMd))));
+			}
+			else if (command.equals(P2PProtocol.GET_FILES_INFO_ACK))
+			{
+				TreeSet<FileInfo> files_info = (TreeSet<FileInfo>) objInput.readObject();
+				if(!peer.someoneFiles.containsAll(files_info))
+				{
+					peer.someoneFiles.addAll(files_info);
+				}
+				sendBackUpToPrev(null);			
+			}
+			
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -208,17 +221,34 @@ public class P2PConnection extends Connection {
 	public void getBackUpFromNext(PeerInfo deadPeer) {
 		// TODO Auto-generated method stub
 		System.out.println("[P2PConnection.getNewBackUp] " + this.socket.getInetAddress());
-		send(P2PProtocol.PEER_DEATH_NOTIFICATION);
-		send(deadPeer);
+		if(deadPeer != null)
+		{
+			send(P2PProtocol.PEER_DEATH_NOTIFICATION);
+			send(deadPeer);
+		}
 		send(P2PProtocol.GET_NEW_BACK_UP_FROM_NEXT);
 	}
 
 	public void sendBackUpToPrev(PeerInfo deadPeer) {
 		// TODO Auto-generated method stub
 		System.out.println("[P2PConnection.setNewBackUp] " + this.socket.getInetAddress());
-		send(P2PProtocol.PEER_DEATH_NOTIFICATION);
-		send(deadPeer);
+		if(deadPeer != null)
+		{
+			send(P2PProtocol.PEER_DEATH_NOTIFICATION);
+			send(deadPeer);
+		}
 		send(P2PProtocol.SEND_BACK_UP_TO_PREV);
 		send(new TreeSet<FileInfo>(peer.someoneFiles));
+	}
+	
+	public void obtainFilesInfo() {
+		send(P2PProtocol.GET_FILES_INFO);
+		send(peer.myInfo);
+	}
+
+	public void obtainBackUp() {
+		send(P2PProtocol.GET_INITIAL_BACK_UP_FROM_NEXT);
+		send(peer.myInfo);
+		getBackUpFromNext(null);		
 	}
 }

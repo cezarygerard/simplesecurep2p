@@ -35,6 +35,7 @@ import common.FileInfo;
 import common.PeerInfo;
 import common.PeerLoginInfo;
 import common.ServerInfo;
+import common.TerminationListener;
 import common.utils;
 
 
@@ -120,7 +121,6 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-
 	}
 
 	public static void main(String[] args) throws UnknownHostException {
@@ -136,6 +136,8 @@ public class Peer implements Runnable {
 			e.printStackTrace();
 		}
 
+		
+		
 		//	(new Thread(p)).start();
 		while(true)
 		{
@@ -162,6 +164,8 @@ public class Peer implements Runnable {
 		}
 
 		sendOutMyFilesInfo();
+		addMyselfIntoNetwork();
+
 		neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		while (true) {
 			//new Server(ss.accept()).start();
@@ -181,6 +185,36 @@ public class Peer implements Runnable {
 				}
 			}
 		}
+	}
+
+	private void addMyselfIntoNetwork() {
+		PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);
+		P2PConnection p2p = null ;
+		try {
+			p2p= new P2PConnection(this, prevPeer.addr,prevPeer.listeningPort);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		final Peer p = this;
+		p2p.addTerminationListener(new TerminationListener() {
+		
+
+			public void connectionTerminated() {
+				PeerInfo nextPeer = getNextPeerInfo((p.myInfo.addrMd));
+				try {
+					P2PConnection p2p= new P2PConnection(p, nextPeer.addr,nextPeer.listeningPort);
+					p2p.obtainBackUp();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		p2p.obtainFilesInfo();		
 	}
 
 	private TimerTask rocognizeNeighbour() {
@@ -444,10 +478,11 @@ public class Peer implements Runnable {
 	}
 	
 	public FileInfo searchForFile(String soughtFileName){
-		return null;
-		
+		return null;		
 	}
 	
-	
+	public FileInfo downloadFile(FileInfo soughtFileName){
+		return null;		
+	}	
 }
 
