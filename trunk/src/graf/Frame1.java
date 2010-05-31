@@ -10,10 +10,12 @@
  */
 
 package graf;
-
+import javax.swing.*;
+import java.awt.*;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
+import javax.swing.JProgressBar;
+import java.awt.event.*;
 /**
  *
  * @author Klauduœ
@@ -69,7 +71,7 @@ public class Frame1 extends javax.swing.JFrame {
             }
         });
 
-        connect.setText("CONNECT");
+        connect.setText("CONNECTED");
         connect.setActionCommand("CONNECT");
         connect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -183,6 +185,11 @@ public class Frame1 extends javax.swing.JFrame {
         pack();
     }// </editor-fold>                        
 
+
+
+
+
+
     private void connectActionPerformed(java.awt.event.ActionEvent evt) {                                        
 
          try{
@@ -201,7 +208,8 @@ public class Frame1 extends javax.swing.JFrame {
         }
 
         try{
-            password1=this.password.getText();
+            password1 = this.password.getText();
+
           /**    if (password1.isEmpty())
             {
                  JOptionPane.showMessageDialog(this, "wprowadz haslo", "error", JOptionPane.ERROR_MESSAGE);
@@ -232,7 +240,7 @@ public class Frame1 extends javax.swing.JFrame {
 
         try{
 
-            serverport1 = this.serverport.getName();
+            serverport1 = this.serverport.getText();
         } catch(Exception e) {
             JOptionPane.showMessageDialog(this.userport , "bledny port uzytkownika", "error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -240,21 +248,43 @@ public class Frame1 extends javax.swing.JFrame {
 
 
 
+         /*
+
          if (login1.isEmpty()){
             JOptionPane.showMessageDialog(this.userport, "wprowadz login", "error", JOptionPane.ERROR_MESSAGE);
 
          }else{
              dispose();
              Grk2 frame2= new Grk2();
+        // new Thread(new thread1()).start();
+
              frame2.setVisible(true);
             
             
-
+         //new Thread(new thread1()).start();
             // connect.addActionListener(new connectAction.actionPerformed());
              //Frame1.frame.EXIT_ON_CLOSE;
          }
+*/
 
-      //  if(  !(login1.isEmpty()) &&  !(password1.isEmpty()) && !(serverport1.isEmpty())
+
+//         if(  login1.contentEquals("") || password1.contentEquals("")|| userport1.contentEquals("")|| serverport1.contentEquals("") ||  server1.contentEquals(""))
+  if(  login1.isEmpty() ||  password1.isEmpty() || (serverport1.isEmpty()) || (userport1.isEmpty()) || (server1.isEmpty()) )
+         {
+
+         JOptionPane.showMessageDialog(this.userport, "wprowadz wszystkie dane", "error", JOptionPane.ERROR_MESSAGE);
+         }
+         else{
+           dispose();
+                  Grk2 frame2 = new Grk2();
+                   frame2.setVisible(true);
+
+         }
+
+
+
+
+         //  if(  !(login1.isEmpty()) &&  !(password1.isEmpty()) && !(serverport1.isEmpty())
         //         && !(userport1.isEmpty()) && !(server1.isEmpty()) ){
 //JOptionPane.showMessageDialog(this.userport, "wprowadz wszystkie dane", "error", JOptionPane.ERROR_MESSAGE);
 
@@ -272,14 +302,41 @@ public class Frame1 extends javax.swing.JFrame {
       //  }
 
 
+
+
+
+
+
+
+
         String spr,spr2, spr3, spr4, spr5;
         spr = login1;
         spr2 = password1;
         spr3 = serverport1;
         spr4 = userport1;
-        System.out.print("login "+spr + "haslo "+spr2 +spr3+spr4);
+        spr5 = server1;
+
+        System.out.print("login "+spr + "haslo "+spr2 +spr3+spr4 +"    "+ spr5);
 
 
+                        //new Thread(new thread1()).start(); //Start the thread
+
+    }
+
+        //The thread
+        public static class thread1 implements Runnable{
+                public void run(){
+
+                    JProgressBar pB = new JProgressBar();
+
+
+                    for (int i=0; i<=100; i++){ //Progressively increment variable i
+                                pB.setValue(i); //Set value
+                                pB.repaint(); //Refresh graphics
+                                try{Thread.sleep(50);} //Sleep 50 milliseconds
+                                catch (InterruptedException err){}
+                        }
+                }
 
 
 
@@ -323,12 +380,46 @@ public class Frame1 extends javax.swing.JFrame {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Frame1().setVisible(true);
-               // connect.ActionListener(new Function());
+                 try {UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());}
+                catch (Exception e) {}
+              //  new Frame1().setVisible(true);
+                JProgressBar pB = new JProgressBar();
+                 new Thread(new thread1()).start();
 
             }
         });
     }
+
+
+      public String getLogin()
+    {
+    	return login1;
+    }
+
+    public String getPassword()
+    {
+    	return password1;
+    }
+
+    public String getUserport()
+    {
+    	return userport1;
+    }
+
+    public String getServerport()
+    {
+    	return serverport1;
+    }
+
+
+  public String getServer()
+  {
+	return server1;
+  }
+
+
+
+
 
 
 
