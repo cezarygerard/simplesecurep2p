@@ -26,4 +26,10 @@ public class P2PProtocol extends ProtocolBase {
 	public static final String SEND_BACK_UP_TO_PREV = "setNewBackUp";
 
 	public static final String GET_NEW_BACK_UP_FROM_NEXT_ACK = "getBackUpACK";
+
+	public static final String GET_FILES_INFO = "getFilesInfo";
+
+	public static final String GET_FILES_INFO_ACK = "getFilesInfoACK";
+
+	public static final String GET_INITIAL_BACK_UP_FROM_NEXT = "getInitialBackUpFromNext";
 }

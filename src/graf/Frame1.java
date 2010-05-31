@@ -69,7 +69,7 @@ public class Frame1 extends javax.swing.JFrame {
             }
         });
 
-        connect.setText("CONNECTED");
+        connect.setText("CONNECT");
         connect.setActionCommand("CONNECT");
         connect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
