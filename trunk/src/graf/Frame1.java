@@ -286,8 +286,6 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 			this.frame2 = new Grk2();
 			frame2.setVisible(true);
 			dispose();
-
-
 		}
 
 
@@ -435,10 +433,10 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 	public void peerActionPerformed(String action) {
 		if(action.equals(PeerActionObserver.CONNECTION_ESTABLISHED));
 		{
+			this.frame2.dispose();
 			Frame3 f3 = new Frame3();
 			f3.activePeer = this.activePeer;
 			f3.setVisible(true);
-			this.frame2.dispose();
 			System.out.println(PeerActionObserver.CONNECTION_ESTABLISHED);
 		}
 	}
