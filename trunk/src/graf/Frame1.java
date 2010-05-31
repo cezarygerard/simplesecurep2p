@@ -69,7 +69,7 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 			}
 		});
 
-		connect.setText("CONNECTED");
+		connect.setText("CONNECT");
 		connect.setActionCommand("CONNECT");
 		connect.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -275,7 +275,7 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 		else{
 			userport2 = Integer.parseInt(userport1);
 			serverport2 = Integer.parseInt(serverport1);
-			System.out.println(userport);        	 
+			//System.out.println(userport);        	 
 			try{ 
 				this.activePeer = Peer.createPeer(server1, serverport2, userport2, login1, password1, null);
 				this.activePeer.addPeerActionObserver(this);
