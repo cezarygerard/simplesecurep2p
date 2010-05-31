@@ -32,6 +32,8 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
+import peer.Peer;
+
 import common.PeerInfo;
 import common.PeerLoginInfo;
 
@@ -87,6 +89,7 @@ public class Server {
 		for (int i = 0; i < server.ss.getEnabledCipherSuites().length; i++) {
 			System.out.println(server.ss.getEnabledCipherSuites()[i]);
 		}
+	
 		/**
 		 * Zrob z tego w¹tek
 		 */
