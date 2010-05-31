@@ -81,63 +81,76 @@ public class Peer implements Runnable {
 	//public Peer(String keystore,  char[] kestorePass, int listeningPort)
 	public Peer(int listeningPort) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, NoSuchProviderException, KeyManagementException, UnrecoverableKeyException
 	{
-			FileInputStream trustedKeystoreInputS = new FileInputStream("./res/peer/key/peerTrustedKeys");
-			this.trustedKeystore = KeyStore.getInstance(KeyStore.getDefaultType());
-			this.trustedKeystore.load(trustedKeystoreInputS,"123456".toCharArray());
-			trustedKeystoreInputS.close();
-			this.tmf = TrustManagerFactory.getInstance("PKIX", "SunJSSE");
-			this.tmf.init(this.trustedKeystore);
-			FileInputStream myKeystoreInputS = new FileInputStream("./res/peer/key/myKeys"); 
-			this.myKeystore = KeyStore.getInstance(KeyStore.getDefaultType());
-			this.myKeystore.load(myKeystoreInputS, "123456".toCharArray());
-			myKeystoreInputS.close();
-			if(myKeystore.containsAlias("peerPrivKey"))
-			{
-				try {
-					X509Certificate cert = (X509Certificate) myKeystore
-					.getCertificate("peerPrivKey");
-					hasValidCert = (cert.getNotAfter().getTime() > System
-							.currentTimeMillis() + 24 * 3600 * 1000);
-				} catch (Exception e) {
-					e.printStackTrace();
-					hasValidCert = false;
-				}
-			}
-			else
-			{
+		FileInputStream trustedKeystoreInputS = new FileInputStream("./res/peer/key/peerTrustedKeys");
+		this.trustedKeystore = KeyStore.getInstance(KeyStore.getDefaultType());
+		this.trustedKeystore.load(trustedKeystoreInputS,"123456".toCharArray());
+		trustedKeystoreInputS.close();
+		this.tmf = TrustManagerFactory.getInstance("PKIX", "SunJSSE");
+		this.tmf.init(this.trustedKeystore);
+		FileInputStream myKeystoreInputS = new FileInputStream("./res/peer/key/myKeys"); 
+		this.myKeystore = KeyStore.getInstance(KeyStore.getDefaultType());
+		this.myKeystore.load(myKeystoreInputS, "123456".toCharArray());
+		myKeystoreInputS.close();
+		if(myKeystore.containsAlias("peerPrivKey"))
+		{
+			try {
+				X509Certificate cert = (X509Certificate) myKeystore
+				.getCertificate("peerPrivKey");
+				hasValidCert = (cert.getNotAfter().getTime() > System
+						.currentTimeMillis() + 24 * 3600 * 1000);
+			} catch (Exception e) {
+				e.printStackTrace();
 				hasValidCert = false;
 			}
-			this.kmf = KeyManagerFactory.getInstance("SunX509", "SunJSSE");
-			this.kmf.init(myKeystore, "123456".toCharArray());
-			this.sc = SSLContext.getInstance("TLS");
-			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-			this.sf = sc.getSocketFactory();
-			this.listeningPort = listeningPort;
-			//		this.ssf = sc.getServerSocketFactory();
-			//		this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
+		}
+		else
+		{
+			hasValidCert = false;
+		}
+		this.kmf = KeyManagerFactory.getInstance("SunX509", "SunJSSE");
+		this.kmf.init(myKeystore, "123456".toCharArray());
+		this.sc = SSLContext.getInstance("TLS");
+		this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+		this.sf = sc.getSocketFactory();
+		this.listeningPort = listeningPort;
+		//		this.ssf = sc.getServerSocketFactory();
+		//		this.ss = (SSLServerSocket) ssf.createServerSocket(this.listeningPort);
 
-			//			ss.setNeedClientAuth(true);			
-			//			ss.setWantClientAuth(true);
+		//			ss.setNeedClientAuth(true);			
+		//			ss.setWantClientAuth(true);
 
-			String s = (new BufferedReader(new FileReader(new File("./res/peer/key/principals"))).readLine());
-			this.certInfo = new X500Principal(s);
-		
+		String s = (new BufferedReader(new FileReader(new File("./res/peer/key/principals"))).readLine());
+		this.certInfo = new X500Principal(s);
+
 	}
-	
-	public static Peer createPeer(String serverAddress, int serverListeningPort, int myListeningPort, String login, String password, String sharedFilesDirectory) throws IOException, KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, NoSuchProviderException{
-		Peer p = new Peer(myListeningPort);
+
+	public static Peer createPeer(String serverAddress, int serverListeningPort, int myListeningPort, String login, String password, String sharedFilesDirectory) throws IOException, KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException, CertificateException, Exception
+	{
+		final Peer p = new Peer(myListeningPort);
 		p.getFiles(null);
 		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName(serverAddress), serverListeningPort);
 		p.peerLogin = new PeerLoginInfo(login, password, false);
+		p2s.addTerminationListener(new TerminationListener() {
+			
+			public void connectionTerminated() throws Exception{
+				try{
+				p.init();
+				}catch (Exception e)
+				{
+					throw e;
+				}				
+			}
+		});
+		
 		p2s.Connect();
-	
+		
 		return p;
 	}
 
-	public static void main(String[] args) throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, NoSuchProviderException, IOException {
+	public static void main(String[] args) throws Exception {
 
-		Peer p = new Peer(9795);
-		p.getFiles(null);
+		Peer p =  createPeer("192.168.1.3", 9995, 9975, "czarek", "12345", null);
+/*		p.getFiles(null);
 		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.1.3"), 9995);
 		p.peerLogin = new PeerLoginInfo("czarek", "12345", false);
 		try {
@@ -146,7 +159,7 @@ public class Peer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+*/
 		//	(new Thread(p)).start();
 		while(true)
 		{
@@ -159,7 +172,7 @@ public class Peer implements Runnable {
 		}
 	}
 
-	public void init() {
+	public void init() throws Exception {
 		try {
 			this.kmf.init(myKeystore, "123456".toCharArray());
 			this.sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
@@ -174,7 +187,7 @@ public class Peer implements Runnable {
 		sendOutMyFilesInfo();
 		addMyselfIntoNetwork();
 	}
-	
+
 	public void run() {
 		neighbourRecognitionTimer.schedule(new RocognizeNeighbour(this), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		while (true) {
@@ -197,40 +210,42 @@ public class Peer implements Runnable {
 		}
 	}
 
-	private void addMyselfIntoNetwork() {
+	private void addMyselfIntoNetwork() throws Exception {
 		PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);
 		if(!prevPeer.equals(this.myInfo))
 		{
 			P2PConnection p2p = null ;
 			try {
 				p2p= new P2PConnection(this, prevPeer.addr,prevPeer.listeningPort);
-	
+
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw new Exception("Nieudane zalogowanie do sieci");
 			}
-	
+
 			final Peer p = this;
 			p2p.addTerminationListener(new TerminationListener() {
-	
-				public void connectionTerminated() {
+
+				public void connectionTerminated() throws Exception {
 					PeerInfo nextPeer = getNextPeerInfo((p.myInfo.addrMd));
 					try {
 						P2PConnection p2p= new P2PConnection(p, nextPeer.addr,nextPeer.listeningPort);
 						p2p.addTerminationListener(new TerminationListener() {
-							
+
 							@Override
 							public void connectionTerminated() {
-							p.StatrListening();
-								
+								p.StatrListening();
+
 							}
 						});
 						p2p.obtainBackUp();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						throw new Exception("Nieudane zalogowanie do sieci");
 					}
-	
+
 				}
 			});
 			p2p.obtainFilesInfo();		
@@ -238,7 +253,7 @@ public class Peer implements Runnable {
 		else 
 			this.StatrListening();
 	}
-	
+
 	private class RocognizeNeighbour extends TimerTask
 	{
 		Peer thisPeer;
@@ -247,21 +262,21 @@ public class Peer implements Runnable {
 			this.thisPeer = thisPeer;
 		}
 		public void run() {
-			 PeerInfo neighbour;
-			 neighbour = getNextPeerInfo(thisPeer.myInfo.addrMd);
-			 if(!(neighbour.equals(thisPeer.myInfo)) && neighbour != null )
+			PeerInfo neighbour;
+			neighbour = getNextPeerInfo(thisPeer.myInfo.addrMd);
+			if(!(neighbour.equals(thisPeer.myInfo)) && neighbour != null )
 			{
-				 try {
-						(new P2PConnection(thisPeer, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						thisPeer.handlePeerDeath(neighbour);
-					}
+				try {
+					(new P2PConnection(thisPeer, neighbour.addr, neighbour.listeningPort)).handleNeighbour();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					thisPeer.handlePeerDeath(neighbour);
+				}
 			}
 		}
-		
+
 	}
-/*	
+	/*	
 	private TimerTask rocognizeNeighbour() {
 		final Peer p = this;
 		final PeerInfo neighbour;
@@ -292,9 +307,9 @@ public class Peer implements Runnable {
 
 			}
 		};
-	
+
 	}
-*/
+	 */
 	private  PeerInfo getNextPeerInfo(String key)
 	{
 		String validKey = null;
@@ -329,9 +344,9 @@ public class Peer implements Runnable {
 	protected void handlePeerDeath(final PeerInfo neighbour) {
 		System.out.println("[Peer.peerDeathNotify] " + neighbour);
 		this.peersInfo.remove(neighbour.addrMd);
-	//	neighbourRecognitionTimer.cancel();
-	//	neighbourRecognitionTimer = new Timer();
-	//	neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
+		//	neighbourRecognitionTimer.cancel();
+		//	neighbourRecognitionTimer = new Timer();
+		//	neighbourRecognitionTimer.schedule(rocognizeNeighbour(), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		final Peer p = this;
 		Thread t = new Thread(new Runnable() {
 
@@ -346,26 +361,48 @@ public class Peer implements Runnable {
 		this.backUpFiles.clear();
 
 
-		final PeerInfo nexyPeer = getNextPeerInfo(this.myInfo.addrMd);	
-		if(!(nexyPeer.equals(this.myInfo)) && nexyPeer != null )
-		{
-			Thread t1 = new Thread(new Runnable() {
+		final PeerInfo nexyPeer = getNextPeerInfo(this.myInfo.addrMd);
+		final PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);
+		//	if(!(nexyPeer.equals(this.myInfo)) && nexyPeer != null )
+		//	{
+		Thread t1 = new Thread(new Runnable() {
 
-				@Override
-				public void run() {
-					P2PConnection p2p;
-					try {
-						p2p = new P2PConnection(p, nexyPeer.addr, nexyPeer.listeningPort);
-						p2p.getBackUpFromNext(neighbour);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+			@Override
+			public void run() {
+				
+				try {
+					if(!(nexyPeer.equals(p.myInfo)) && nexyPeer != null )
+					{
+						try {
+							P2PConnection p2pNext = new P2PConnection(p, nexyPeer.addr, nexyPeer.listeningPort);
+							p2pNext.getBackUpFromNext(neighbour);
+						}
+						catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
+					
+					if(!(prevPeer.equals(p.myInfo)) && prevPeer != null)
+					{
+						try {
+							P2PConnection p2pPrev = new P2PConnection(p, prevPeer.addr, prevPeer.listeningPort);
+							p2pPrev.sendBackUpToPrev(neighbour);
+						}
+						catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			}, "handlerPeerDeath getNewBackUp " + neighbour);
-			t1.start();
-		}
-
+			}
+		}, "handlerPeerDeath getNewBackUp " + neighbour);
+		t1.start();
+		//	}
+		/*
 		final PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);	
 		if(!(prevPeer.equals(this.myInfo)) && prevPeer != null )
 		{
@@ -385,6 +422,7 @@ public class Peer implements Runnable {
 			}, "handlerPeerDeath setNewBackUp " + neighbour);
 			t2.start();
 		}
+		 */
 	}
 
 	void storeX509cert(X509Certificate cert, KeyPair keyPair) throws KeyStoreException {

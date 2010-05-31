@@ -32,7 +32,7 @@ public class P2PConnection extends Connection {
 	public P2PConnection(Socket accept, Peer thisPeer) 
 	{
 		super();
-		System.out.println("[P2PConnection]");
+		System.out.println("[P2PConnection] " + accept.getInetAddress());
 		this.socket = (SSLSocket) accept;
 
 		//	System.out.println(socket.getRemoteSocketAddress());
@@ -77,7 +77,6 @@ public class P2PConnection extends Connection {
 			e.printStackTrace();
 
 		}
-		PeerInfo pi = new PeerInfo(socket.getInetAddress(), socket.getPort());
 		thread = new  Thread(this, "P2PCONNECTION " + socket.getInetAddress());
 		thread.start();
 	}
