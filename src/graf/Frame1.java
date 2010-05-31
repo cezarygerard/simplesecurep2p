@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import java.awt.event.*;
+
+import peer.Peer;
 /**
  *
  * @author Klauduœ
@@ -263,40 +265,25 @@ public class Frame1 extends javax.swing.JFrame {
   if(  login1.isEmpty() ||  password1.isEmpty() || (serverport1.isEmpty()) || (userport1.isEmpty()) || (server1.isEmpty()) )
          {
 
-         JOptionPane.showMessageDialog(this.userport, "wprowadz wszystkie dane", "error", JOptionPane.ERROR_MESSAGE);
+         JOptionPane.showMessageDialog(this, "wprowadz wszystkie dane", "error", JOptionPane.ERROR_MESSAGE);
          }
          else{
-           dispose();
-                  Grk2 frame2 = new Grk2();
-                   frame2.setVisible(true);
+        	 userport2 = Integer.parseInt(userport1);
+        	 serverport2 = Integer.parseInt(serverport1);
+System.out.println(userport);        	 
+        	try{ this.activePeer = Peer.createPeer(server1, serverport2, userport2, login1, password1, null);
+        	
+        	}
+        	catch(Exception e){
+        		System.out.println("[i] dsfghjgfdsafgh");
+        	}
+             Grk2 frame2 = new Grk2();
+              frame2.setVisible(true);
+              frame2.activePeer = this.activePeer;
+              dispose();
+                 
                    
          }
-
-
-
-
-         //  if(  !(login1.isEmpty()) &&  !(password1.isEmpty()) && !(serverport1.isEmpty())
-        //         && !(userport1.isEmpty()) && !(server1.isEmpty()) ){
-//JOptionPane.showMessageDialog(this.userport, "wprowadz wszystkie dane", "error", JOptionPane.ERROR_MESSAGE);
-
-    //     if( (login1.isEmpty()) || (password1.isEmpty()) ||(serverport1.isEmpty())
-     //            ||(userport1.isEmpty()) ||(server1.isEmpty()) ){
-
- 
-        //JOptionPane.showMessageDialog(this.userport, "wprowadz wszystkie dane", "error", JOptionPane.ERROR_MESSAGE);
-       // }
-
-
-      //   else {
-      //        Grk2 frame2 = new Grk2();
-      //  frame2.setVisible(true);
-      //  }
-
-
-
-
-
-
 
 
 
@@ -350,9 +337,6 @@ public class Frame1 extends javax.swing.JFrame {
     //serverport.setComponentOrientation(ComponentOrientation.UNKNOWN);
      serverport.setText("");
 
-
-
-
     }                                     
 
     /**
@@ -382,14 +366,14 @@ public class Frame1 extends javax.swing.JFrame {
     	return password1;
     }
 
-    public String getUserport()
+    public int getUserport()
     {
-    	return userport1;
+    	return userport2;
     }
 
-    public String getServerport()
+    public int getServerport()
     {
-    	return serverport1;
+    	return serverport2;
     }
 
 
@@ -403,7 +387,11 @@ public class Frame1 extends javax.swing.JFrame {
 
 
 
-
+  Peer activePeer;
+  private int userport2;
+  private int serverport2;
+  
+ // private String sharedFilesDirectory = null;
    private String login1;
    private String password1;
    private String userport1;
