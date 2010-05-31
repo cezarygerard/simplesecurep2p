@@ -190,6 +190,11 @@ public class P2PConnection extends Connection {
 				}
 				sendBackUpToPrev(null);			
 			}
+			else if (command.equals(P2PProtocol.GET_INITIAL_BACK_UP_FROM_NEXT))
+			{
+				PeerInfo pi = (PeerInfo) objInput.readObject();
+				this.peer.peersInfo.put(pi.addrMd, pi);
+			}
 			
 
 		} catch (Exception e) {
@@ -242,11 +247,13 @@ public class P2PConnection extends Connection {
 	}
 	
 	public void obtainFilesInfo() {
+		System.out.println("[P2PConnection.obtainFilesInfo] " + this.socket.getInetAddress());
 		send(P2PProtocol.GET_FILES_INFO);
 		send(peer.myInfo);
 	}
 
 	public void obtainBackUp() {
+		System.out.println("[P2PConnection.obtainBackUp] " + this.socket.getInetAddress());
 		send(P2PProtocol.GET_INITIAL_BACK_UP_FROM_NEXT);
 		send(peer.myInfo);
 		getBackUpFromNext(null);		
