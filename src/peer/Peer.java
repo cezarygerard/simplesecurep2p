@@ -610,9 +610,9 @@ public class Peer implements Runnable {
 
 	public void downloadFile(FileInfo soughtFileInfo)
 	{
-		Random random = new Random();
-		int i = random.nextInt() % soughtFileInfo.ownersInfo.size();
-		PeerInfo owner = soughtFileInfo.ownersInfo.get(i);
+		//Random random = new Random();
+		//int i = random.nextInt() % soughtFileInfo.ownersInfo.size();
+		PeerInfo owner = soughtFileInfo.ownersInfo.get(0);
 		P2PConnection p2p = null;
 		try {
 			p2p = new P2PConnection(this, owner.addr, owner.listeningPort);

@@ -29,7 +29,7 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 		// type = fi.getType();
 	}
 
-	DefaultTableModel tmcontekst = new DefaultTableModel(null, new String[]{"id", "nazwa", "rozmiar", "infopeer"} );
+	DefaultTableModel tmcontekst = new DefaultTableModel(null, new String[]{"id", "nazwa", "typ", "rozmiar"} );
 	List<Contekst> conteksty;
 	ListSelectionModel lsmContekt;
 
@@ -194,8 +194,8 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 		r5 = new Receiving5();
 		r5.setVisible(true);
 		this.activePeer.addPeerActionObserver(this);
-		this.activePeer.searchForFile(namefile1);
-
+		this.activePeer.downloadFile(this.file);
+		
 
 
 
@@ -208,27 +208,27 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 
 
 
-	private void uzupTabel(List<Contekst> conteksty){
-		if(conteksty.size() ==0){
-			JOptionPane.showMessageDialog(null, "error");}
+	private void uzupTabel(FileInfo file){
+		if(file == null){
+			JOptionPane.showMessageDialog(null, "Nie znaleziono pliku");
+			}
 		else{
-			String[] linia = new String[]{null ,null, null, null};
-			for (int i = 0; i<conteksty.size(); i++)
+			for (int i= 0; i<tmcontekst.getRowCount(); i++ )
 			{
-				tmcontekst.addRow(linia);
-				tmcontekst.setValueAt(i, i, 0);
-				tmcontekst.setValueAt(conteksty.get(i).getname(), i, 1);
-				tmcontekst.setValueAt(conteksty.get(i).getSize(), i, 2);
-				tmcontekst.setValueAt(conteksty.get(i).getinfopeer(), i, 3);
-
+				tmcontekst.removeRow(i);
+			}
+			String[] linia = new String[]{file.name ,file.type, file.size + " " , null};
+				tmcontekst.addRow(linia);				
+			/*	tmcontekst.setValueAt(0, 1, 0);
+				tmcontekst.setValueAt(file.name, 0, 1);
+				tmcontekst.setValueAt(file.type, 0, 2);
+				tmcontekst.setValueAt(file.size, 0, 3);
+			*/
 			}
 
 
 
 		}
-
-
-	}
 
 
 
@@ -267,9 +267,10 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 		if(actionType.equals(PeerActionObserver.FILE_FOUND));
 		{
 			s6.dispose();
-			uzupTabel(conteksty);
+			uzupTabel(file);
 			//f3.activePeer = this.activePeer;
-
+			if(file != null)
+				this.file = file;
 
 			//f3.setVisible(true);
 			//this.frame2.dispose();
@@ -280,12 +281,14 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 		if (actionType.equals(PeerActionObserver.FILE_DOWNLOADED  ))
 		{
 			//poinformuj uzytkownika
-
+				
 			r5.dispose();
 			//this.r5 = new Receiving5();
 			//r5.activePeer = this.activePeer;
 			r5.setVisible(true);
 			//dispose();
+			if(file == null)
+			JOptionPane.showMessageDialog(null, "Nie udalo sie pobrac pliku");
 		}
 	}
 
@@ -302,6 +305,7 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 	Receiving5 r5;
 	private String name;
 	private String type;
+	FileInfo file;
 }
 
 

@@ -90,11 +90,11 @@ public class Receiving5 extends javax.swing.JFrame {
 
     private void exitActionPerformed(java.awt.event.ActionEvent evt) {
        System.out.println(0);
+       System.exit(0);
     }
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {
-        Frame3 frame3 = new Frame3();
-        frame3.setVisible(true);
+        this.dispose();
     }
 
     /**
