@@ -193,7 +193,21 @@ public class P2PConnection extends Connection {
 				PeerInfo pi = (PeerInfo) objInput.readObject();
 				this.peer.peersInfo.put(pi.addrMd, pi);
 			}
-			
+			else if (command.equals(P2PProtocol.GET_FILE_OWNER))
+			{
+				String fileMD = input.readLine();
+				send(P2PProtocol.GET_FILE_OWNER_ACK);
+				FileInfo tmp = new FileInfo(fileMD);
+				FileInfo fi = ((new TreeSet<FileInfo>(peer.someoneFiles)).subSet(tmp, true, tmp, true)).first();
+				send(fi);
+				//send(peer.someoneFiles.)
+				terminateConnectionGently();
+			}
+			else if (command.equals(P2PProtocol.GET_FILE_OWNER_ACK))
+			{
+				FileInfo fi = (FileInfo) objInput.readObject();
+				this.peer.fileFound(fi);
+			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -258,7 +272,8 @@ public class P2PConnection extends Connection {
 	}
 
 	public void searchForFile(String fileNameMD) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("[P2PConnection.searchForFile] " + this.socket.getInetAddress());
+		send(P2PProtocol.GET_FILE_OWNER);
+		send(fileNameMD);		
 	}
 }

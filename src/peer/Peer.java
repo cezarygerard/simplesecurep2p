@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -37,6 +36,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.auth.x500.X500Principal;
 
+import common.PeerActionObserver;
 import common.FileInfo;
 import common.PeerInfo;
 import common.PeerLoginInfo;
@@ -73,7 +73,7 @@ public class Peer implements Runnable {
 	ServerInfo serverInfo;
 	X500Principal certInfo;
 	Timer neighbourRecognitionTimer = new Timer("neighbourRecognitionThread");
-
+	List<PeerActionObserver> observers = Collections.synchronizedList(new ArrayList<PeerActionObserver>());
 	///elementy potrzebne do nasluchowania
 	private SSLServerSocketFactory ssf;
 	private SSLServerSocket ss;
@@ -189,6 +189,10 @@ public class Peer implements Runnable {
 	}
 
 	public void run() {
+		for(int i = 0; i< observers.size() ; i++)
+		{
+			observers.get(i).peerActionPerformed(PeerActionObserver.CONNECTION_ESTABLISHED);
+		}
 		neighbourRecognitionTimer.schedule(new RocognizeNeighbour(this), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		while (true) {
 			//new Server(ss.accept()).start();
@@ -235,7 +239,7 @@ public class Peer implements Runnable {
 
 							@Override
 							public void connectionTerminated() {
-								p.StatrListening();
+								p.StartListening();
 
 							}
 						});
@@ -251,7 +255,7 @@ public class Peer implements Runnable {
 			p2p.obtainFilesInfo();		
 		}
 		else 
-			this.StatrListening();
+			this.StartListening();
 	}
 
 	private class RocognizeNeighbour extends TimerTask
@@ -441,7 +445,7 @@ public class Peer implements Runnable {
 		}
 	}
 
-	void StatrListening() {
+	void StartListening() {
 		if (this.hasValidCert)
 		{
 			new Thread(this, "Listening Thread").start();
@@ -561,21 +565,53 @@ public class Peer implements Runnable {
 		}		
 	}
 
-	public FileInfo searchForFile(String soughtFileName){
+	public void searchForFile(String soughtFileName){
+		
+		String fileNameMD = null;
+		FileInfo soughtFileInfo = null;
 		try {
-			String 	fileNameMD = utils.toHexString(utils.MDigest(null, soughtFileName.getBytes()));
-			PeerInfo pi = getPrevPeerInfo(fileNameMD);
-			P2PConnection p2p = new P2PConnection(this, pi.addr, pi.listeningPort);
+			fileNameMD = utils.toHexString(utils.MDigest(null, soughtFileName.getBytes()));
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		P2PConnection p2p = null;
+		PeerInfo pi = null;
+		try {
+			pi = getPrevPeerInfo(fileNameMD);
+			p2p = new P2PConnection(this, pi.addr, pi.listeningPort);
 			p2p.searchForFile(fileNameMD);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		return null;	
+			try{
+				pi = getPrevPeerInfo(pi.addrMd);
+				p2p = new P2PConnection(this, pi.addr, pi.listeningPort);
+				p2p.searchForFile(fileNameMD);
+			}catch (Exception e1) {
+				e1.printStackTrace();
+				fileFound(null);
+			}
+		}	
 	}
+
 
 	public FileInfo downloadFile(FileInfo soughtFileInfo){
 		return null;		
 	}	
+	
+	public void addFileActionObserver(PeerActionObserver observer)
+	{
+		observers.add(observer);
+		
+	}
+	
+	void fileFound(FileInfo fi) {
+		// TODO Auto-generated method stub
+		for(int i = 0; i< observers.size() ; i++)
+		{
+			observers.get(i).fileActionPerformed(fi, PeerActionObserver.FILE_FOUND);
+		}
+	}
 }
 

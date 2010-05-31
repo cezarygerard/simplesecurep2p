@@ -32,4 +32,8 @@ public class P2PProtocol extends ProtocolBase {
 	public static final String GET_FILES_INFO_ACK = "getFilesInfoACK";
 
 	public static final String GET_INITIAL_BACK_UP_FROM_NEXT = "getInitialBackUpFromNext";
+
+	public static final String GET_FILE_OWNER = "getFileOwner";
+	
+	public static final String GET_FILE_OWNER_ACK = "getFileOwnerACK";
 }
