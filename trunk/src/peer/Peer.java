@@ -276,7 +276,7 @@ public class Peer implements Runnable {
 					P2PConnection p2p;
 					try {
 						p2p = new P2PConnection(p, nexyPeer.addr, nexyPeer.listeningPort);
-						p2p.getNewBackUp();
+						p2p.getBackUpFromNext(neighbour);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -296,7 +296,7 @@ public class Peer implements Runnable {
 					P2PConnection p2p;
 					try {
 						p2p = new P2PConnection(p, prevPeer.addr, prevPeer.listeningPort);
-						p2p.setNewBackUp();
+						p2p.sendBackUpToPrev(neighbour);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -442,5 +442,12 @@ public class Peer implements Runnable {
 			}
 		}		
 	}
+	
+	public FileInfo searchForFile(String soughtFileName){
+		return null;
+		
+	}
+	
+	
 }
 
