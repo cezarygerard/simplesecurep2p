@@ -216,5 +216,6 @@ for (int i = 0; i<conteksty.size(); i++)
     private javax.swing.JButton search;
     private javax.swing.JScrollPane table;
     // End of variables declaration
+	public Peer activePeer;
 
 }
