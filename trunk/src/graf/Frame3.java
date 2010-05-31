@@ -154,11 +154,18 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
         namefile1 =this.namefile.getText();
        
         
-      FileInfo fi = new FileInfo();
-      name = fi.getName();
-      type = fi.getType();
+     
       
-       fileActionPerformed( ,FILE_FOUND);
+      
+      
+      this.activePeer.addPeerActionObserver(this);
+      this.activePeer.searchForFile(namefile1);
+
+      
+     //  activePeer.searchForFile(s);
+       //miesjce w którym bêdê œci¹gaæ plik
+      // getPeer().searchForFile(namefile1);
+      
        
       //  activePeer.searchForFile(s);
         //miesjce w którym bêdê œci¹gaæ plik
@@ -184,6 +191,13 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
     //	f3.activePeer.downloadFile(soughtFileInfo);
     	//miejsce na œci¹gniêcie 
     	
+    	this.activePeer.addPeerActionObserver(this);
+        this.activePeer.searchForFile(namefile1);
+        
+
+       
+        
+        
     	//Peer.searchForFile();
     }
 
@@ -250,7 +264,12 @@ for (int i = 0; i<conteksty.size(); i++)
 	public void fileActionPerformed(FileInfo file, String actionType) {
 		if(actionType.equals(PeerActionObserver.FILE_FOUND));
 		{
-			//Frame3 f3 = new Frame3();
+			Searching6 s6= new Searching6(); 
+			s6.activePeer = this.activePeer;
+			s6.setVisible(true);
+			//dispose();
+			
+			
 			uzupTabel(conteksty);
 			//f3.activePeer = this.activePeer;
 			
@@ -265,7 +284,12 @@ for (int i = 0; i<conteksty.size(); i++)
 		{
 			//poinformuj uzytkownika
 			
-			
+			Receiving5 r5 = new Receiving5();
+	        
+	    	//this.r5 = new Receiving5();
+	    	r5.activePeer = this.activePeer;
+			r5.setVisible(true);
+			//dispose();
 		}
 		
 		
@@ -280,8 +304,7 @@ for (int i = 0; i<conteksty.size(); i++)
 		
 	}
 
- 	
-	
+ //Peer activePeer;
 	
 private String name;
 private String type;
