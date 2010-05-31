@@ -5,6 +5,8 @@ import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import peer.P2PConnection;
+import peer.Peer;
+import common.FileInfo;
 /**
  *
  * @author Klauduœ
@@ -139,7 +141,13 @@ public class Frame3 extends javax.swing.JFrame {
 
     private void searchActionPerformed(java.awt.event.ActionEvent evt) {
         namefile1 =this.namefile.getText();
+       
+        
+        //miesjce w którym bêdê œci¹gaæ plik
+       // getPeer().searchForFile(namefile1);
+        
         uzupTabel( conteksty);
+        
         
     }
 
@@ -152,7 +160,11 @@ public class Frame3 extends javax.swing.JFrame {
 }
 
     private void dowloadActionPerformed(java.awt.event.ActionEvent evt) {
-    P2PConnection.getFile();        // TODO add your handling code here:
+   // P2PConnection.downloadFile(FileInfo soughtFileName);        // TODO add your handling code here:
+    
+    	//miejsce na œci¹gniêcie 
+    	
+    	//Peer.searchForFile();
     }
 
 
