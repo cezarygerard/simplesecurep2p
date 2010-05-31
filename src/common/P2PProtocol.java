@@ -36,4 +36,10 @@ public class P2PProtocol extends ProtocolBase {
 	public static final String GET_FILE_OWNER = "getFileOwner";
 	
 	public static final String GET_FILE_OWNER_ACK = "getFileOwnerACK";
+
+	public static final String DOWNLOAD_FILE = "downloadFile";
+
+	public static final String DOWNLOAD_FILE_ACK = "downloadFileACK";
+
+	public static final String FILE_DOWNLOAD_FAILED = "FILE_DOWNLOAD_FAILED";
 }

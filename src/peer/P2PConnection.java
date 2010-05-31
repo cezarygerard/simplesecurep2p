@@ -1,6 +1,9 @@
 package peer;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -19,6 +22,7 @@ import common.Connection;
 import common.FileInfo;
 import common.P2PProtocol;
 import common.PeerInfo;
+import common.utils;
 
 
 /**
@@ -209,8 +213,56 @@ public class P2PConnection extends Connection {
 			{
 				FileInfo fi = (FileInfo) objInput.readObject();
 				this.peer.fileFound(fi);
+			}else  if (command.equals(P2PProtocol.DOWNLOAD_FILE))
+			{
+				String fileName = input.readLine();
+				String fileMD = utils.toHexString(utils.MDigest(null, fileName.getBytes()));
+				FileInfo tmp = new FileInfo(fileMD);
+				FileInfo fi = ((new TreeSet<FileInfo>(peer.someoneFiles)).subSet(tmp, true, tmp, true)).first();
+				File file =	fi.file;
+				FileInputStream fis;
+				try{
+					fis = new FileInputStream(file);
+				}
+				catch (Exception e)
+				{
+					send(P2PProtocol.FILE_DOWNLOAD_FAILED);
+					terminateConnectionWithFailure();
+					return;
+				}
+				byte[]b = new byte[1024];
+				int off = 0;
+				int len = 1024;
+				send(P2PProtocol.DOWNLOAD_FILE_ACK);
+				send(fi);
+				while(fis.read(b, off, len) != -1)
+				{
+					send(b);
+					off+=len;
+				}
+				
+			}else  if (command.equals(P2PProtocol.FILE_DOWNLOAD_FAILED))
+			{
+				peer.fileDownloaded(null);
 			}
-
+			else  if (command.equals(P2PProtocol.DOWNLOAD_FILE_ACK))
+			{
+				FileInfo fi = (FileInfo) objInput.readObject();
+				FileOutputStream fos;
+				String pathName = peer.sharedFilesDirectory + 	File.pathSeparator + fi.name + "." + fi.type;
+				fos = new FileOutputStream(pathName);
+				byte[] b = new byte[1024];
+				while (objInput.read(b) != -1)
+				{
+					fos.write(b);
+				}
+				//fos.write(b);
+				fos.close();
+				terminateConnectionGently();
+				fi.file = new File(pathName);
+				peer.fileDownloaded(fi);
+			}
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -234,7 +286,7 @@ public class P2PConnection extends Connection {
 	public void handleNeighbour() {
 		System.out.println("[P2PConnection.handleNeighbour] " + this.socket.getInetAddress());
 		send(P2PProtocol.NEIGHBOUR_RECOGNITION_INIT);
-	
+
 	}
 
 	public void getBackUpFromNext(PeerInfo deadPeer) {
@@ -259,7 +311,7 @@ public class P2PConnection extends Connection {
 		send(P2PProtocol.SEND_BACK_UP_TO_PREV);
 		send(new TreeSet<FileInfo>(peer.someoneFiles));
 	}
-	
+
 	public void obtainFilesInfo() {
 		System.out.println("[P2PConnection.obtainFilesInfo] " + this.socket.getInetAddress());
 		send(P2PProtocol.GET_FILES_INFO);
@@ -277,5 +329,11 @@ public class P2PConnection extends Connection {
 		System.out.println("[P2PConnection.searchForFile] " + this.socket.getInetAddress());
 		send(P2PProtocol.GET_FILE_OWNER);
 		send(fileNameMD);		
+	}
+
+	public void downloadFile(String name) {
+		System.out.println("[P2PConnection.downloadFile] " + this.socket.getInetAddress());
+		send(P2PProtocol.DOWNLOAD_FILE);
+		send(name);			
 	}
 }
