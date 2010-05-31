@@ -50,9 +50,9 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 	private static final long serialVersionUID = 1L;
 	public String name;
 	String desc;
-	String type;
+	public String type;
 	public long size;
-	transient File file;
+	transient public File file;
 	public String nameMD;
 	public List<PeerInfo> ownersInfo = Collections.synchronizedList(new ArrayList<PeerInfo>());
 

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.Timer;
@@ -77,7 +78,7 @@ public class Peer implements Runnable {
 	///elementy potrzebne do nasluchowania
 	private SSLServerSocketFactory ssf;
 	private SSLServerSocket ss;
-	private String sharedFilesDirectory;
+	String sharedFilesDirectory;
 
 	//public Peer(String keystore,  char[] kestorePass, int listeningPort)
 	public Peer(int listeningPort) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, NoSuchProviderException, KeyManagementException, UnrecoverableKeyException
@@ -607,8 +608,19 @@ public class Peer implements Runnable {
 	}
 
 
-	public FileInfo downloadFile(FileInfo soughtFileInfo){
-		return null;		
+	public void downloadFile(FileInfo soughtFileInfo)
+	{
+		Random random = new Random();
+		int i = random.nextInt() % soughtFileInfo.ownersInfo.size();
+		PeerInfo owner = soughtFileInfo.ownersInfo.get(i);
+		P2PConnection p2p = null;
+		try {
+			p2p = new P2PConnection(this, owner.addr, owner.listeningPort);
+		} catch (Exception e) {
+			fileDownloaded(null);
+			return;
+		}
+		p2p.downloadFile(soughtFileInfo.name);
 	}	
 	
 	public void addPeerActionObserver(PeerActionObserver observer)
@@ -618,11 +630,20 @@ public class Peer implements Runnable {
 	}
 	
 	void fileFound(FileInfo fi) {
-		// TODO Auto-generated method stub
+		
 		System.out.println(fi);
 		for(int i = 0; i< observers.size() ; i++)
 		{
 			observers.get(i).fileActionPerformed(fi, PeerActionObserver.FILE_FOUND);
+		}
+	}
+	
+	void fileDownloaded(FileInfo fi) {
+		
+		System.out.println(fi);
+		for(int i = 0; i< observers.size() ; i++)
+		{
+			observers.get(i).fileActionPerformed(fi,PeerActionObserver.FILE_DOWNLOADED );
 		}
 	}
 }
