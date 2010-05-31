@@ -207,6 +207,7 @@ public class P2PConnection extends Connection {
 				FileInfo tmp = new FileInfo(fileMD);
 				try{
 					FileInfo fi = ((new TreeSet<FileInfo>(peer.someoneFiles)).subSet(tmp, true, tmp, true)).first();
+					send(P2PProtocol.FILE_FOUND);
 					send(fi);
 				}
 				catch (Exception e)
@@ -220,9 +221,17 @@ public class P2PConnection extends Connection {
 			}
 			else if (command.equals(P2PProtocol.GET_FILE_OWNER_ACK))
 			{
-				FileInfo fi = (FileInfo) objInput.readObject();
-				this.peer.fileFound(fi);
-			}else  if (command.equals(P2PProtocol.DOWNLOAD_FILE))
+				if(input.readLine().equals(P2PProtocol.FILE_FOUND))
+				{	
+					FileInfo fi = (FileInfo) objInput.readObject();
+					this.peer.fileFound(fi);
+				}
+				else
+				{
+					this.peer.fileFound(null);
+				}
+			}
+			else  if (command.equals(P2PProtocol.DOWNLOAD_FILE))
 			{
 				FileInfo tmp =  (FileInfo) objInput.readObject();
 				FileInfo fi;
