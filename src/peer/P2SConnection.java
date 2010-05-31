@@ -125,6 +125,11 @@ public class P2SConnection extends Connection implements Runnable {
 				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput.readObject();
 				this.peer.peersInfo = Collections.synchronizedSortedMap(pi);
 			}
+			else if (command.equals(P2SProtocol.PEER_SYNCHRONIZATION_ACK))
+			{
+				TreeMap<String, PeerInfo> pi = (TreeMap<String, PeerInfo>) objInput.readObject();
+				this.peer.peersInfo = Collections.synchronizedSortedMap(pi);
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -138,5 +143,11 @@ public class P2SConnection extends Connection implements Runnable {
 		send(peer.peerLogin);
 		send(P2SProtocol.PEER_DEATH_NOTIFICATION);
 		send(deadPeerInfo);
+	}
+
+	public void synchronize() {
+		send(P2SProtocol.LOGIN);
+		send(peer.peerLogin);
+		send(P2SProtocol.PEER_SYNCHRONIZATION_REQUEST);
 	}
 }

@@ -258,7 +258,7 @@ public class P2PConnection extends Connection {
 			{
 				FileInfo fi = (FileInfo) objInput.readObject();
 				FileOutputStream fos;
-				String pathName = peer.sharedFilesDirectory + 	File.pathSeparator + fi.name + "." + fi.type;
+				String pathName = peer.sharedFilesDirectory + 	"/" + fi.name + "." + fi.type;
 				fos = new FileOutputStream(pathName);
 				byte[] b = new byte[1024];
 				while (objInput.read(b) != -1)
