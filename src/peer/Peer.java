@@ -173,7 +173,7 @@ public class Peer implements Runnable {
 				e.printStackTrace();
 			}
 			///@Debug
-		//	p.searchForFile("gfd");
+			//p.searchForFile("gfd");
 		}
 	}
 
@@ -620,7 +620,7 @@ public class Peer implements Runnable {
 			fileDownloaded(null);
 			return;
 		}
-		p2p.downloadFile(soughtFileInfo);
+		//p2p.downloadFile(soughtFileInfo);
 	}	
 	
 	public void addPeerActionObserver(PeerActionObserver observer)

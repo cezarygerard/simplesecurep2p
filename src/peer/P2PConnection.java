@@ -258,7 +258,9 @@ public class P2PConnection extends Connection {
 					System.out.println(len);
 				}
 				
-			}else  if (command.equals(P2PProtocol.FILE_DOWNLOAD_FAILED))
+			}
+			
+			else  if (command.equals(P2PProtocol.FILE_DOWNLOAD_FAILED))
 			{
 				peer.fileDownloaded(null);
 			}
@@ -268,6 +270,7 @@ public class P2PConnection extends Connection {
 				FileOutputStream fos;
 				String pathName = peer.sharedFilesDirectory + 	"/" + fi.name + "." + fi.type;
 				fos = new FileOutputStream(pathName);
+				
 				byte[] b = new byte[1024];
 				int len = 0;
 				while ((len = objInput.read(b)) != -1)
