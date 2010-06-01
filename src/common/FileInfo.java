@@ -22,7 +22,8 @@ public class FileInfo implements Serializable, Comparable<FileInfo>{
 		{
 			StringTokenizer st = new StringTokenizer(file2.getName(), ".");
 			String nameWithoutType = new String();
-			for (int i = 0 ; i < st.countTokens() -1; i++)
+			int tokensCount = st.countTokens();
+			for (int i = 0 ; i < tokensCount -1; i++)
 			{
 				nameWithoutType += st.nextToken();
 			}
