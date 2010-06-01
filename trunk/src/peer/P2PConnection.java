@@ -266,6 +266,7 @@ public class P2PConnection extends Connection {
 					oStream.write(b);
 					System.out.println(new String(b) + " \t\t||len: "+ len);
 					totalLen += len;
+					b = new byte[1024];
 				}
 				fis.close();
 				oStream.close();
@@ -293,12 +294,13 @@ public class P2PConnection extends Connection {
 				while ((lenTmp = iStream.read(b)) != -1)
 				{
 					fos.write(b);
-					System.out.println("lenTmp: " + lenTmp + " TOTAL: " + len);
+					System.out.println(new String(b) + " \t\t||len: "+ len);
+
+					//System.out.println("lenTmp: " + lenTmp + " TOTAL: " + len);
 					len += lenTmp;
-					System.out.println("Bufor: " + iStream.available());
 				}
 			//	System.out.println("Bufor: " + this.socket.getReceiveBufferSize());
-				System.out.println(pathName  + " >" + len + "<");
+				System.out.println("TOTAL:  " + len + " last " + lenTmp);
 				fos.close();
 				terminateConnectionGently();
 				fi.file = new File(pathName);
