@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -32,7 +34,8 @@ import common.utils;
 public class P2PConnection extends Connection {
 
 	private Peer peer;
-
+	OutputStream oStream; 
+	InputStream iStream;
 	public P2PConnection(Socket accept, Peer thisPeer) 
 	{
 		super();
@@ -77,6 +80,8 @@ public class P2PConnection extends Connection {
 			close = false;
 			objOutput = new ObjectOutputStream(socket.getOutputStream());
 			objInput = new ObjectInputStream (socket.getInputStream());
+			oStream = socket.getOutputStream();
+			iStream = socket.getInputStream();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -255,7 +260,7 @@ public class P2PConnection extends Connection {
 				send(fi);
 				while((len = fis.read(b)) != -1)
 				{
-					send(b);
+					oStream.write(b);
 					System.out.println(len);
 				}
 				
@@ -277,12 +282,15 @@ public class P2PConnection extends Connection {
 				
 				byte[] b = new byte[1024];
 				int len = 0;
-				
-				while ((len = objInput.read(b)) != -1)
+				int lenTmp = 0;
+				System.out.println("Bufor: " + this.socket.getReceiveBufferSize());
+				while ((lenTmp = iStream.read(b)) != -1 || len == 0)
 				{
 					fos.write(b);
-					System.out.println(len);
+					System.out.println(lenTmp + "  " + len);
+					len += lenTmp;
 				}
+				System.out.println("Bufor: " + this.socket.getReceiveBufferSize());
 				System.out.println(pathName  + " >" + len + "<");
 				fos.close();
 				terminateConnectionGently();
