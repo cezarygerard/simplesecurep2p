@@ -34,17 +34,24 @@ public class P2SConnection extends Connection implements Runnable {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING, PEERDEATHNOTIFICATION
 	}
 
-	P2SConnection(Peer p, InetAddress addr, int port) {
+	P2SConnection(Peer p, InetAddress addr, int port) throws IOException {
 		super();
 		this.addr = addr;
 		this.port = port;
 		this.peer = p;
 		p.serverInfo = new ServerInfo(addr, port);
+		socket = (SSLSocket) p.sf.createSocket(addr, port);
+		input = new BufferedReader(new InputStreamReader(socket
+				.getInputStream()));
+		output = new PrintWriter(socket.getOutputStream(), true);
+
+		objOutput = new ObjectOutputStream(socket.getOutputStream());
+		objInput = new ObjectInputStream(socket.getInputStream());
 	}
 
 	void Connect() throws IOException {
 
-		socket = (SSLSocket) peer.sf.createSocket(addr, port);
+		
 		socket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
 			public void handshakeCompleted(HandshakeCompletedEvent arg0) {
 				// System.out.println("handshakeCompleted " + arg0.toString() +
@@ -56,14 +63,6 @@ public class P2SConnection extends Connection implements Runnable {
 		// to moznaby inicjalizowac po wstepnym postawieniu nasluchiwania -
 		// wiemy jakie gniazdko dostaniemy od systemu
 		peer.myInfo = new PeerInfo(socket.getLocalAddress(), peer.listeningPort);
-
-		input = new BufferedReader(new InputStreamReader(socket
-				.getInputStream()));
-		output = new PrintWriter(socket.getOutputStream(), true);
-
-		objOutput = new ObjectOutputStream(socket.getOutputStream());
-		objInput = new ObjectInputStream(socket.getInputStream());
-
 		state = STATE.LOGGING;
 		System.out.println("[P2SConnection.Connect()] ");
 		send(P2SProtocol.LOGIN);

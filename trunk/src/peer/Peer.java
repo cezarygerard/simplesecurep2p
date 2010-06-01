@@ -377,8 +377,13 @@ public class Peer implements Runnable {
 
 			@Override
 			public void run() {
+				try{
 				P2SConnection p2s = new P2SConnection(p,p.serverInfo.addr, p.serverInfo.listeningPort);
 				p2s.peerDeathNotification(neighbour);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}, "handlerPeerDeath, peerDeathNotification " + neighbour);
 		t.start();
@@ -669,8 +674,14 @@ public class Peer implements Runnable {
 	
 	void synchroniezeWithServer()
 	{
+		try
+		{
 		P2SConnection p2s = new P2SConnection(this, serverInfo.addr, serverInfo.listeningPort);
 		p2s.synchronize();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void handleLoginFailed() {
