@@ -263,7 +263,9 @@ public class P2PConnection extends Connection {
 					oStream.write(b);
 					System.out.println(len);
 				}
-				
+				fis.close();
+				oStream.flush();
+				System.out.println("UPLOAD_FILE_DONE");
 			}
 			
 			else  if (command.equals(P2PProtocol.FILE_DOWNLOAD_FAILED))
