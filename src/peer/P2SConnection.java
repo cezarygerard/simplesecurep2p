@@ -91,11 +91,11 @@ public class P2SConnection extends Connection implements Runnable {
 			System.out.println("[P2SConnection.HandleCommand] command: "
 					+ command);
 			// timeoutTask.cancel();
-			if ((state == STATE.LOGGING && command.equals(P2SProtocol.LOGINACK))
+		 if ((state == STATE.LOGGING && command.equals(P2SProtocol.LOGINACK))
 					|| command.equals(P2SProtocol.GETYOURINFO)) {
-				System.out
-						.println("[P2SConnection.HandleCommand.HandleCommand] MYINFO sending");
+
 				state = STATE.LOGGEDIN;
+				peer.loginSuccesfull = true;
 				send(P2SProtocol.MYINFO);
 				send(peer.myInfo);
 				send(P2SProtocol.GETPEERSINFO);

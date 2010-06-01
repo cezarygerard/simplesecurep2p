@@ -266,7 +266,7 @@ public class P2PConnection extends Connection {
 						totalLen += len;
 						//b = new byte[1024];				
 					}
-					//		ByteBuffer subBuf = ByteBuffer.wrap(b, 0, len);
+					//ByteBuffer subBuf = ByteBuffer.wrap(b, 0, len);
 					//		oStream.write(subBuf.array());
 					oStream.flush();
 					fis.close();			
@@ -306,17 +306,18 @@ public class P2PConnection extends Connection {
 					{
 						lenTmp = iStream.read(b);
 						fos.write(b);
-						System.out.println(new String(b) + " \t\t||len: "+ len);
-
-						//System.out.println("lenTmp: " + lenTmp + " TOTAL: " + len);
 						len += lenTmp;
+						System.out.println(new String(b) + " \t\t||len: "+ len);
+						//System.out.println("lenTmp: " + lenTmp + " TOTAL: " + len);			
 					}
 					lenTmp = iStream.read(b);
-					len += lenTmp;
-					ByteBuffer subBuf = ByteBuffer.wrap(b, 0,(int) (len - fileSize));
-					fos.write(subBuf.array());
+					//len += lenTmp;
+					ByteBuffer subBuf = ByteBuffer.wrap(b, 0,(int) (fileSize - len));
+					byte[] b1 = new byte[(int) (fileSize - len)];
+					subBuf.get(b1);
+					fos.write(b1);
 					//	System.out.println("Bufor: " + this.socket.getReceiveBufferSize());		 
-					System.out.println("TOTAL:  " + len + " last " + lenTmp);
+					System.out.println("TOTAL:  " + len + " last " + lenTmp + "  " + fileSize + "last chunk: " + (fileSize - len));
 					fos.close();
 					terminateConnectionGently();
 					fi.file = new File(pathName);
