@@ -25,22 +25,22 @@ public class Receiving5 extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        exit = new javax.swing.JButton();
+     //   exit = new javax.swing.JButton();
         back = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 255));
 
-        jLabel1.setText("RECEIVED FILE");
+        jLabel1.setText("Rozpoczeto pobieranie pliku");
 
-        exit.setText("EXIT");
-        exit.addActionListener(new java.awt.event.ActionListener() {
+   //     exit.setText("EXIT");
+    /*    exit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exitActionPerformed(evt);
             }
         });
-
+*/
         back.setText("BACK");
         back.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -61,7 +61,8 @@ public class Receiving5 extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(back)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(exit))))
+                     //   .addComponent(exit)
+                        )))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -70,7 +71,7 @@ public class Receiving5 extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(exit)
+                    //.addComponent(exit)
                     .addComponent(back)))
         );
 
@@ -110,7 +111,7 @@ public class Receiving5 extends javax.swing.JFrame {
 
     // Variables declaration - do not modify
     private javax.swing.JButton back;
-    private javax.swing.JButton exit;
+   // private javax.swing.JButton exit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration

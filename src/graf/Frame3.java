@@ -285,10 +285,12 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 			r5.dispose();
 			//this.r5 = new Receiving5();
 			//r5.activePeer = this.activePeer;
-			r5.setVisible(true);
+			//r5.setVisible(true);
 			//dispose();
 			if(file == null)
-			JOptionPane.showMessageDialog(null, "Nie udalo sie pobrac pliku");
+				JOptionPane.showMessageDialog(null, "Nie udalo sie pobrac pliku");
+			else
+				JOptionPane.showMessageDialog(null, "Pobrano plik: ");
 		}
 	}
 
