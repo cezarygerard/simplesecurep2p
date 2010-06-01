@@ -255,14 +255,14 @@ public class P2PConnection extends Connection {
 					int len = 0;
 					int totalLen = 0;
 					send(P2PProtocol.DOWNLOAD_FILE_ACK);	
-					System.out.println(fi + " FILE SIZE: " + file.length());
+			//		System.out.println(fi + " FILE SIZE: " + file.length());
 					send(fi);
 					send(Long.toString(file.length()));
 
 					while(( len = fis.read(b)) != -1)
 					{
 						oStream.write(b);
-						System.out.println(new String(b) + " \t\t||len: "+ len);
+				//		System.out.println(new String(b) + " \t\t||len: "+ len);
 						totalLen += len;
 						//b = new byte[1024];				
 					}
@@ -270,7 +270,7 @@ public class P2PConnection extends Connection {
 					//		oStream.write(subBuf.array());
 					oStream.flush();
 					fis.close();			
-					System.out.println("UPLOAD_FILE_DONE totalLen: " + totalLen + " last len " + len) ;
+			//		System.out.println("UPLOAD_FILE_DONE totalLen: " + totalLen + " last len " + len) ;
 				}
 				catch (Exception e)
 				{
@@ -300,14 +300,14 @@ public class P2PConnection extends Connection {
 					byte[] b = new byte[1024];
 					int len = 0;
 					int lenTmp = 0;
-					System.out.println("Bufor: " + iStream.available());
+		//			System.out.println("Bufor: " + iStream.available());
 					//while ((lenTmp = iStream.read(b)) != -1)
 					while (fileSize > len + b.length)
 					{
 						lenTmp = iStream.read(b);
 						fos.write(b);
 						len += lenTmp;
-						System.out.println(new String(b) + " \t\t||len: "+ len);
+			//			System.out.println(new String(b) + " \t\t||len: "+ len);
 						//System.out.println("lenTmp: " + lenTmp + " TOTAL: " + len);			
 					}
 					lenTmp = iStream.read(b);
@@ -317,7 +317,7 @@ public class P2PConnection extends Connection {
 					subBuf.get(b1);
 					fos.write(b1);
 					//	System.out.println("Bufor: " + this.socket.getReceiveBufferSize());		 
-					System.out.println("TOTAL:  " + len + " last " + lenTmp + "  " + fileSize + "last chunk: " + (fileSize - len));
+			//		System.out.println("TOTAL:  " + len + " last " + lenTmp + "  " + fileSize + "last chunk: " + (fileSize - len));
 					fos.close();
 					terminateConnectionGently();
 					fi.file = new File(pathName);
