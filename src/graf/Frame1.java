@@ -277,15 +277,24 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 			serverport2 = Integer.parseInt(serverport1);
 			//System.out.println(userport);        	 
 			try{ 
+				this.frame2 = new Grk2();
+				frame2.setVisible(true);
+				dispose();
 				this.activePeer = Peer.createPeer(server1, serverport2, userport2, login1, password1, null);
 				this.activePeer.addPeerActionObserver(this);
 			}
 			catch(Exception e){
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Nieudane polaczenie z serwerem, zamykanie programu","error", JOptionPane.ERROR_MESSAGE);
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					System.exit(1);
+				}
+				System.exit(1);
 			}
-			this.frame2 = new Grk2();
-			frame2.setVisible(true);
-			dispose();
+
 		}
 
 
@@ -433,7 +442,9 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 	public void peerActionPerformed(String action) {
 		if(action.equals(PeerActionObserver.CONNECTION_ESTABLISHED));
 		{
-			this.frame2.dispose();
+			if(this.frame2 != null)
+				this.frame2.dispose();
+			
 			Frame3 f3 = new Frame3();
 			f3.activePeer = this.activePeer;
 			f3.setVisible(true);

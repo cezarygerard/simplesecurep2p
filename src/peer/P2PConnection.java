@@ -268,7 +268,7 @@ public class P2PConnection extends Connection {
 					totalLen += len;
 				}
 				fis.close();
-				oStream.flush();
+				oStream.close();
 				System.out.println("UPLOAD_FILE_DONE totalLen: " + totalLen) ;
 			}
 			
