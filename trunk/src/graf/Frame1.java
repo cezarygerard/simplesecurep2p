@@ -18,7 +18,7 @@ import peer.Peer;
  *
  * @author Klauduœ
  */
-public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
+public class Frame1 extends javax.swing.JFrame implements PeerActionObserver, Comparable<PeerActionObserver> {
 	private Grk2 frame2;
 	//private Object frame;
 
@@ -452,6 +452,13 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 			
 		}
 		//System.out.println("Frame1 " + actionPerformed);
+	}
+
+
+	@Override
+	public int compareTo(PeerActionObserver o) {
+		
+		return o.toString().compareTo(this.toString());
 	}
 
 }
