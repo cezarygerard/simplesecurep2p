@@ -55,10 +55,11 @@ public class Server {
 	private SSLServerSocketFactory ssf;
 	private SSLServerSocket ss;
 	PrivateKey caPrivKey;
+	int listeningPort;
 	public enum STATE {
 		CONNECTING, IDLE, CONNECTED, LOGGEDIN, DONE, LOGGING
 	}
-	public Server(String keystoreLoc,  char[] kestorePass, int listeningPort)
+	public Server(String keystoreLoc,  char[] kestorePass)
 	{
 		try {
 			is = new FileInputStream(keystoreLoc) ;
@@ -69,7 +70,7 @@ public class Server {
 			sc = SSLContext.getInstance("SSL");
 			sc.init(kmf.getKeyManagers(), null, null);
 			ssf = sc.getServerSocketFactory();
-			readLoginInfo("./res/server/peerLoginInfo.dat");
+			readServerInfo("./res/server/ServerInfo.dat");
 			ss = (SSLServerSocket)ssf.createServerSocket(listeningPort);
 			caPrivKey = (PrivateKey) keystore.getKey("serverTrustedCert", "123456".toCharArray());
 			
@@ -80,12 +81,13 @@ public class Server {
 		}	
 	}
 
+
 	public static void main(String[] args) throws Exception {
 
 
-		Server server = new Server ("./res/server/key/serverKeys" , "123456".toCharArray(), 9995 );
-		System.out.println(server.sc.getProvider());
-		System.out.println(server.ss.getEnabledCipherSuites());
+		Server server = new Server ("./res/server/key/serverKeys" , "123456".toCharArray());
+	//	System.out.println(server.sc.getProvider());
+	//	System.out.println(server.ss.getEnabledCipherSuites());
 		for (int i = 0; i < server.ss.getEnabledCipherSuites().length; i++) {
 			System.out.println(server.ss.getEnabledCipherSuites()[i]);
 		}
@@ -108,29 +110,43 @@ public class Server {
 	 * Metoda zaczytujaca z pliku loginy i skroty hasel
 	 * @TODO dodac sol do hasel
 	 */
-	private void readLoginInfo(String peerLoginInfo)
+	private void readServerInfo(String serverInfo)
 	{
 		try {
 			System.out.println("readLoginInfo");
-			FileReader fr = new FileReader(peerLoginInfo);
+			FileReader fr = new FileReader(serverInfo);
 
 			BufferedReader br = new BufferedReader(fr);
 			StringTokenizer st;// = new StringTokenizer();
-			String line;
-
-			while((line = br.readLine()) != null)
-			{	
-
-				st = new StringTokenizer(line);
-				if((st.countTokens() )!= 2)
-					throw new Exception("Ivalid peerLoginInfo.dat file");
-
-				loginInfo.add(new PeerLoginInfo(st.nextToken(), st.nextToken(), true));
+			String line;			
+			boolean timeTobreak = false;
+			while(!timeTobreak)
+			{
+				line =br.readLine();
+				if(!(line.startsWith("#")))
+				{	
+					this.listeningPort = Integer.valueOf(line);
+					timeTobreak = true;
+				}
+			}
+			
+			while((line = br.readLine()) != null )
+			{		
+				
+				if(!(line.startsWith("#")))
+				{
+					st = new StringTokenizer(line);
+					if((st.countTokens() )!= 2)
+						throw new Exception("Ivalid peerLoginInfo.dat file");
+	
+					loginInfo.add(new PeerLoginInfo(st.nextToken(), st.nextToken(), true));
+				}
 			}
 			System.out.println("[Server.readLoginInfo()] " + loginInfo);
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
