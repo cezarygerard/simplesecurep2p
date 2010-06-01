@@ -251,6 +251,7 @@ public class P2PConnection extends Connection {
 				byte[]b = new byte[1024];
 				int len = 0;
 				send(P2PProtocol.DOWNLOAD_FILE_ACK);
+				System.out.println(fi);
 				send(fi);
 				while((len = fis.read(b)) != -1)
 				{
@@ -264,21 +265,25 @@ public class P2PConnection extends Connection {
 			{
 				peer.fileDownloaded(null);
 			}
+			
 			else  if (command.equals(P2PProtocol.DOWNLOAD_FILE_ACK))
 			{
+				System.out.println("DOWNLOAD_FILE_ACK");
 				FileInfo fi = (FileInfo) objInput.readObject();
+				System.out.println(fi);
 				FileOutputStream fos;
 				String pathName = peer.sharedFilesDirectory + 	"/" + fi.name + "." + fi.type;
 				fos = new FileOutputStream(pathName);
 				
 				byte[] b = new byte[1024];
 				int len = 0;
+				
 				while ((len = objInput.read(b)) != -1)
 				{
 					fos.write(b);
 					System.out.println(len);
 				}
-				
+				System.out.println(pathName  + " >" + len + "<");
 				fos.close();
 				terminateConnectionGently();
 				fi.file = new File(pathName);

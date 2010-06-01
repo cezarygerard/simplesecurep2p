@@ -167,7 +167,7 @@ public class Peer implements Runnable {
 		while(true)
 		{
 			try {
-				Thread.sleep(10000 + utils.NEIGHBOUR_RECOGNITION_PERIOD * 2);
+				Thread.sleep(100 + utils.NEIGHBOUR_RECOGNITION_PERIOD );
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -620,7 +620,7 @@ public class Peer implements Runnable {
 			fileDownloaded(null);
 			return;
 		}
-		//p2p.downloadFile(soughtFileInfo);
+		p2p.downloadFile(soughtFileInfo);
 	}	
 	
 	public void addPeerActionObserver(PeerActionObserver observer)
@@ -639,6 +639,8 @@ public class Peer implements Runnable {
 		
 		if(fi == null)
 			synchroniezeWithServer();
+		
+	//	downloadFile(fi);
 	}
 	
 	void fileDownloaded(FileInfo fi) {
