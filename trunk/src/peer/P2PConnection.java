@@ -264,12 +264,12 @@ public class P2PConnection extends Connection {
 				while((len = fis.read(b)) != -1)
 				{
 					oStream.write(b);
-					System.out.println(len);
+					System.out.println(new String(b) + " \t\t||len: "+ len);
 					totalLen += len;
 				}
 				fis.close();
 				oStream.close();
-				System.out.println("UPLOAD_FILE_DONE totalLen: " + totalLen) ;
+				System.out.println("UPLOAD_FILE_DONE totalLen: " + totalLen + " last len " + len) ;
 			}
 			
 			else  if (command.equals(P2PProtocol.FILE_DOWNLOAD_FAILED))
@@ -289,12 +289,13 @@ public class P2PConnection extends Connection {
 				byte[] b = new byte[1024];
 				int len = 0;
 				int lenTmp = 0;
-			//	System.out.println("Bufor: " + this.socket.getReceiveBufferSize());
+				System.out.println("Bufor: " + iStream.available());
 				while ((lenTmp = iStream.read(b)) != -1)
 				{
 					fos.write(b);
 					System.out.println("lenTmp: " + lenTmp + " TOTAL: " + len);
 					len += lenTmp;
+					System.out.println("Bufor: " + iStream.available());
 				}
 			//	System.out.println("Bufor: " + this.socket.getReceiveBufferSize());
 				System.out.println(pathName  + " >" + len + "<");
