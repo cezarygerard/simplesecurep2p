@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -238,14 +239,36 @@ public class P2PConnection extends Connection {
 			}
 			else  if (command.equals(P2PProtocol.DOWNLOAD_FILE))
 			{
-				FileInfo tmp =  (FileInfo) objInput.readObject();
-				FileInfo fi;
-				FileInputStream fis;
-				File file;
 				try{
+					FileInfo tmp =  (FileInfo) objInput.readObject();
+					FileInfo fi;
+					FileInputStream fis;
+					File file;
+
 					fi = ((new TreeSet<FileInfo>(peer.sharedFiles)).subSet(tmp, true, tmp, true)).first();
 					file =	fi.file;
 					fis = new FileInputStream(file);
+
+					byte[]b = new byte[1024];
+					Byte[] b1;// = new Byte(0)[1024];
+					int len = 0;
+					int totalLen = 0;
+					send(P2PProtocol.DOWNLOAD_FILE_ACK);
+					System.out.println(fi + " FILE SIZE: " + file.length());
+					send(fi);
+
+					while(( len = fis.read(b)) == 1024)
+					{
+						oStream.write(b);
+						System.out.println(new String(b) + " \t\t||len: "+ len);
+						totalLen += len;
+						//b = new byte[1024];				
+					}
+					ByteBuffer subBuf = ByteBuffer.wrap(b, 0, len);
+					oStream.write(subBuf.array());
+					oStream.flush();
+					fis.close();			
+					System.out.println("UPLOAD_FILE_DONE totalLen: " + totalLen + " last len " + len) ;
 				}
 				catch (Exception e)
 				{
@@ -254,30 +277,13 @@ public class P2PConnection extends Connection {
 					terminateConnectionWithFailure();
 					return;
 				}
-				byte[]b = new byte[1024];
-				int len = 0;
-				int totalLen = 0;
-				send(P2PProtocol.DOWNLOAD_FILE_ACK);
-				System.out.println(fi + " FILE SIZE: " + file.length());
-				send(fi);
-				
-				while((len = fis.read(b)) != -1)
-				{
-					oStream.write(b);
-					System.out.println(new String(b) + " \t\t||len: "+ len);
-					totalLen += len;
-					b = new byte[1024];
-				}
-				fis.close();
-		//		oStream.close();
-				System.out.println("UPLOAD_FILE_DONE totalLen: " + totalLen + " last len " + len) ;
 			}
-			
+
 			else  if (command.equals(P2PProtocol.FILE_DOWNLOAD_FAILED))
 			{
 				peer.fileDownloaded(null);
 			}
-			
+
 			else  if (command.equals(P2PProtocol.DOWNLOAD_FILE_ACK))
 			{
 				System.out.println("DOWNLOAD_FILE_ACK");
@@ -286,7 +292,7 @@ public class P2PConnection extends Connection {
 				FileOutputStream fos;
 				String pathName = peer.sharedFilesDirectory + 	"/" + fi.name + "." + fi.type;
 				fos = new FileOutputStream(pathName);
-				
+
 				byte[] b = new byte[1024];
 				int len = 0;
 				int lenTmp = 0;
@@ -299,7 +305,7 @@ public class P2PConnection extends Connection {
 					//System.out.println("lenTmp: " + lenTmp + " TOTAL: " + len);
 					len += lenTmp;
 				}
-			//	System.out.println("Bufor: " + this.socket.getReceiveBufferSize());
+				//	System.out.println("Bufor: " + this.socket.getReceiveBufferSize());
 				System.out.println("TOTAL:  " + len + " last " + lenTmp);
 				fos.close();
 				terminateConnectionGently();
@@ -310,13 +316,13 @@ public class P2PConnection extends Connection {
 			{
 				peer.fileDownloaded(null);
 			}
-			
+
 			else if (command.equals(P2PProtocol.FILE_FIND_FAILED))
 			{
 				peer.fileFound(null);
 			}
-			
-			
+
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
