@@ -189,24 +189,11 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 
 	private void dowloadActionPerformed(java.awt.event.ActionEvent evt) {
 
-		//	f3.activePeer.downloadFile(soughtFileInfo);
-		//miejsce na œci¹gniêcie 
 		r5 = new Receiving5();
 		r5.setVisible(true);
 		this.activePeer.addPeerActionObserver(this);
 		this.activePeer.downloadFile(this.file);
-		
-
-
-
-
-		//Peer.searchForFile();
 	}
-
-
-
-
-
 
 	private void uzupTabel(FileInfo file){
 		if(file == null){
@@ -264,7 +251,7 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 
 	@Override
 	public void fileActionPerformed(FileInfo file, String actionType) {
-		if(actionType.equals(PeerActionObserver.FILE_FOUND));
+		if(actionType.equalsIgnoreCase(PeerActionObserver.FILE_FOUND));
 		{
 			s6.dispose();
 			uzupTabel(file);
@@ -278,7 +265,7 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 
 		}
 
-		if (actionType.equals(PeerActionObserver.FILE_DOWNLOADED  ))
+		if (actionType.equalsIgnoreCase(PeerActionObserver.FILE_DOWNLOADED  ))
 		{
 			//poinformuj uzytkownika
 				

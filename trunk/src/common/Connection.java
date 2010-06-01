@@ -76,24 +76,32 @@ public abstract class Connection implements Runnable {
 	 */
 	protected abstract void HandleCommand(String command) throws ClassNotFoundException, IOException;
 /*
+	protected void HandleCommand(String command) throws ClassNotFoundException, IOException
+	{
+	//	this.timer.cancel();
+	}
+*/
+	
+/*	
 	protected void setTimeout(int time)
 	{
-		timeoutTask = new TimerTask() {
-			
-			@Override
-			public void run() {
-				send(P2SProtocol.TIMEOUT);
-				terminateConnectionWithFailure();
-			}
-		};
-		timer.schedule(timeoutTask, time);
+		timer = new Timer("TimeOut") ;
+		timer.schedule(new TimeOutTask(), time);
 	}
-*/	
+	
+	private class TimeOutTask extends TimerTask
+	{
+		public void run() {
+			send(P2SProtocol.TIMEOUT);
+			terminateConnectionWithFailure();
+		}
+	}
+*/
 	/**
 	 * wyslanie komendy
 	 */
 	protected void send(String command) {
-		//setTimeout(10000);
+	//	setTimeout(10000);
 		if (output != null)
             output.println(command);
     }
@@ -149,6 +157,11 @@ public abstract class Connection implements Runnable {
 	public void addTerminationListener(TerminationListener listener)
 	{
 		listeners.add(listener);
+		
+	}
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
 		
 	}
 }

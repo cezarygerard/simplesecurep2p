@@ -11,6 +11,7 @@ import common.FileInfo;
 import common.PeerActionObserver;
 
 import java.awt.event.*;
+import java.io.IOException;
 
 import peer.Peer;
 /**
@@ -285,22 +286,21 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 			}
 			catch(Exception e){
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(this, "Nieudane polaczenie z serwerem, zamykanie programu","error", JOptionPane.ERROR_MESSAGE);
-				try {
+				JOptionPane.showMessageDialog(this, "Nieudane polaczenie z serwerem","error", JOptionPane.ERROR_MESSAGE);
+				if(this.frame2 != null)
+					this.frame2.dispose();
+				
+				this.setVisible(true);
+		/*		try {
 					Thread.sleep(10000);
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					System.exit(1);
 				}
 				System.exit(1);
+				*/
 			}
-
 		}
-
-
-
-
-
 	}
 
 	//The thread
@@ -328,12 +328,6 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 
 
 	private void loginActionPerformed(java.awt.event.ActionEvent evt) {                                      
-
-
-
-
-
-
 	}                                     
 
 	private void exitActionPerformed(java.awt.event.ActionEvent evt) {                                     
@@ -429,27 +423,35 @@ public class Frame1 extends javax.swing.JFrame implements PeerActionObserver {
 	private javax.swing.JTextField server;
 	private javax.swing.JTextField serverport;
 	private javax.swing.JTextField userport;
+	private Frame3 f3;
 	// End of variables declaration                   
 
 
 	public void fileActionPerformed(FileInfo file, String actionType) {
-
-
 	}
 
-
-
-	public void peerActionPerformed(String action) {
-		if(action.equals(PeerActionObserver.CONNECTION_ESTABLISHED));
+	public void peerActionPerformed(String actionPerformed) {
+		if(actionPerformed.equals((String)PeerActionObserver.CONNECTION_ESTABLISHED))
 		{
 			if(this.frame2 != null)
 				this.frame2.dispose();
 			
-			Frame3 f3 = new Frame3();
+			this.f3 = new Frame3();
 			f3.activePeer = this.activePeer;
 			f3.setVisible(true);
-			System.out.println(PeerActionObserver.CONNECTION_ESTABLISHED);
+			return;
 		}
+		else if(actionPerformed.equals((String)PeerActionObserver.LOGIN_FAILED));
+		{
+			if(this.frame2 != null)
+				this.frame2.dispose();
+			
+			this.setVisible(true);
+			JOptionPane.showMessageDialog(this, "Nieudane Logowanie", "error", JOptionPane.ERROR_MESSAGE);
+			return;
+			
+		}
+		//System.out.println("Frame1 " + actionPerformed);
 	}
 
 }

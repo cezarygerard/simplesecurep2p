@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.Timer;
@@ -74,12 +75,14 @@ public class Peer implements Runnable {
 	ServerInfo serverInfo;
 	X500Principal certInfo;
 	Timer neighbourRecognitionTimer = new Timer("neighbourRecognitionThread");
-	List<PeerActionObserver> observers = Collections.synchronizedList(new ArrayList<PeerActionObserver>());
+	SortedSet<PeerActionObserver> observers = Collections.synchronizedSortedSet(new TreeSet<PeerActionObserver>());
 	///elementy potrzebne do nasluchowania
 	private SSLServerSocketFactory ssf;
 	private SSLServerSocket ss;
 	String sharedFilesDirectory;
-
+	boolean loginSuccesfull;
+	
+	
 	//public Peer(String keystore,  char[] kestorePass, int listeningPort)
 	public Peer(int listeningPort) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, NoSuchProviderException, KeyManagementException, UnrecoverableKeyException
 	{
@@ -93,6 +96,7 @@ public class Peer implements Runnable {
 		this.myKeystore = KeyStore.getInstance(KeyStore.getDefaultType());
 		this.myKeystore.load(myKeystoreInputS, "123456".toCharArray());
 		myKeystoreInputS.close();
+		loginSuccesfull = false;
 		if(myKeystore.containsAlias("peerPrivKey"))
 		{
 			try {
@@ -151,7 +155,7 @@ public class Peer implements Runnable {
 
 	public static void main(String[] args) throws Exception {
 
-		Peer p =  createPeer("192.168.1.3", 9995, 9975, "czarek", "12345", null);
+		Peer p =  createPeer("192.168.1.3", 9995, 9975, "cza2rek", "123425", null);
 		
 /*		p.getFiles(null);
 		P2SConnection p2s = new P2SConnection(p, InetAddress.getByName("192.168.1.3"), 9995);
@@ -197,10 +201,10 @@ public class Peer implements Runnable {
 	public void run() {
 		
 		System.out.println("[Peer.run]");
-		for(int i = 0; i< observers.size() ; i++)
-		{
-			observers.get(i).peerActionPerformed(PeerActionObserver.CONNECTION_ESTABLISHED);
+		for (Iterator<PeerActionObserver> iterator = observers.iterator(); iterator.hasNext();) {
+			(iterator.next()).peerActionPerformed(PeerActionObserver.CONNECTION_ESTABLISHED );			
 		}
+
 		
 		neighbourRecognitionTimer.schedule(new RocognizeNeighbour(this), utils.NEIGHBOUR_RECOGNITION_PERIOD, utils.NEIGHBOUR_RECOGNITION_PERIOD);
 		
@@ -226,6 +230,7 @@ public class Peer implements Runnable {
 
 	private void addMyselfIntoNetwork() throws Exception 
 	{
+		try{
 		System.out.println("[Peer.addMyselfIntoNetwork]");
 		PeerInfo prevPeer = getPrevPeerInfo(this.myInfo.addrMd);
 		if(!prevPeer.equals(this.myInfo))
@@ -268,6 +273,10 @@ public class Peer implements Runnable {
 		}
 		else 
 			this.StartListening();
+		}
+		catch (Exception e) {
+			this.StartListening();
+		}
 	}
 
 	private class RocognizeNeighbour extends TimerTask
@@ -458,10 +467,12 @@ public class Peer implements Runnable {
 	}
 
 	void StartListening() {
-		if (this.hasValidCert)
+		if (this.hasValidCert && loginSuccesfull)
 		{
 			new Thread(this, "Listening Thread").start();
-		}		
+		}
+		else
+			this.handleLoginFailed();
 	}
 
 	void getFiles(String path)
@@ -492,7 +503,7 @@ public class Peer implements Runnable {
 	 * @Todo optymalizacji poprzez grupowania plikow do poszczegolnych peerow i przeslanie tego jednym polaczeniem
 	 */
 	synchronized  void sendOutMyFilesInfo(){
-
+		try{
 		for (Iterator<FileInfo> iterator = sharedFiles.iterator(); iterator.hasNext();) 
 		{
 			synchronized (this) {
@@ -574,7 +585,11 @@ public class Peer implements Runnable {
 
 				t.start();
 			}
-		}		
+		}
+		}
+		catch (Exception e) {
+		//	this.handleLoginFailed();
+		}
 	}
 
 	public void searchForFile(String soughtFileName){
@@ -632,11 +647,9 @@ public class Peer implements Runnable {
 	void fileFound(FileInfo fi) {
 		
 		System.out.println(fi);
-		for(int i = 0; i< observers.size() ; i++)
-		{
-			observers.get(i).fileActionPerformed(fi, PeerActionObserver.FILE_FOUND);
+		for (Iterator<PeerActionObserver> iterator = observers.iterator(); iterator.hasNext();) {
+			(iterator.next()).fileActionPerformed(fi, PeerActionObserver.FILE_FOUND);			
 		}
-		
 		if(fi == null)
 			synchroniezeWithServer();
 		
@@ -646,9 +659,8 @@ public class Peer implements Runnable {
 	void fileDownloaded(FileInfo fi) {
 		
 		System.out.println(fi);
-		for(int i = 0; i< observers.size() ; i++)
-		{
-			observers.get(i).fileActionPerformed(fi,PeerActionObserver.FILE_DOWNLOADED );
+		for (Iterator<PeerActionObserver> iterator = observers.iterator(); iterator.hasNext();) {
+			(iterator.next()).fileActionPerformed(fi, PeerActionObserver.FILE_DOWNLOADED);			
 		}
 		
 		if(fi == null)
@@ -659,6 +671,14 @@ public class Peer implements Runnable {
 	{
 		P2SConnection p2s = new P2SConnection(this, serverInfo.addr, serverInfo.listeningPort);
 		p2s.synchronize();
+	}
+
+	public void handleLoginFailed() {
+		System.out.println("handleLoginFailed");
+		for (Iterator<PeerActionObserver> iterator = observers.iterator(); iterator.hasNext();) {
+			(iterator.next()).peerActionPerformed(PeerActionObserver.LOGIN_FAILED);			
+		}
+		
 	}
 }
 
