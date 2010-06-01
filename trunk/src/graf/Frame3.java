@@ -19,7 +19,7 @@ import common.PeerActionObserver;
  *
  * @author Klauduœ
  */
-public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
+public class Frame3 extends javax.swing.JFrame implements PeerActionObserver,  Comparable<PeerActionObserver>{
 
 	/** Creates new form Frame3 */
 	public Frame3() {
@@ -295,6 +295,12 @@ public class Frame3 extends javax.swing.JFrame implements PeerActionObserver{
 	private String name;
 	private String type;
 	FileInfo file;
+
+
+	public int compareTo(PeerActionObserver o) {
+		
+		return o.toString().compareTo(this.toString());
+	}
 }
 
 
